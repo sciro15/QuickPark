@@ -3,6 +3,8 @@ import personaRoutes from './PersonaRoute.js';
 import AdministradorRoutes from './AdministradorRote.js';
 import ParqueaderoRoutes from './ParqueaderoRoutes.js';
 import ServicioRoutes from './ServicioRoutes.js';
+import CalificacionRoutes from './CalificacionRoutes.js';
+import ImagenRoutes from './ImagenRoutes.js';
 
 const router = express.Router();
 
@@ -10,6 +12,8 @@ const router = express.Router();
 router.use('/personas', personaRoutes);
 router.use('/Administrador', AdministradorRoutes);
 router.use('/Parqueadero', ParqueaderoRoutes);
-router.use('/Parqueadero', ServicioRoutes);
+router.use('/Servicio', ServicioRoutes);
+router.use('/Calificacion', CalificacionRoutes); 
+router.use('/Imagen', ImagenRoutes);  
 
 export default router;
