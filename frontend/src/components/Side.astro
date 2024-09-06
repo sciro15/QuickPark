@@ -1,0 +1,46 @@
+---
+export interface Props {
+  isAdmin: boolean;
+}
+
+const { isAdmin } = Astro.props;
+
+const userLinks = [
+  { href: '/', icon: 'fa-home' },
+  { href: '/perfil', icon: 'fa-user'},
+  { href: '/soporte', icon: 'fa-headset' }
+];
+
+const adminLinks = [
+  { href: '/dashboard', icon: 'fa-tachometer-alt' },
+  { href: '/usuarios', icon: 'fa-users' },
+  { href: '/reportes', icon: 'fa-file-alt' }
+];
+---
+<aside class="Sidebar w-36 h-screen text-white p-4 fixed top-0 left-0">
+  
+    <nav class="w-64 mx-auto">
+        <ul>
+          {isAdmin ? (
+            adminLinks.map(link => (
+              
+            ))
+          ) : (
+            userLinks.map(link => (
+              <li class="mb-4">
+                <a href={link.href} class="text-lg hover:text-gray-300 transition-colors">{link.text}</a>
+              </li>
+            ))
+          )}
+        </ul>
+      </nav>
+      
+    
+</aside>
+ <style>
+    .Sidebar {
+        background-color: #1C2222;
+    }
+
+
+ </style>

@@ -1,0 +1,19 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Sidebar from '../components/Side.astro';
+
+// Aquí podrías tener lógica para verificar el rol del usuario
+const isAdmin = false;
+---
+
+<Layout title="Welcome to Astro.">
+	<main>
+		<Sidebar isAdmin={isAdmin} />
+	</main>
+</Layout>
+
+<style>
+	body {
+		
+	}
+</style>
