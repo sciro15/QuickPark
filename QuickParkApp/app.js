@@ -1,8 +1,33 @@
-const express = require('express');
-const app =  express();
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import router from './routes/app.js';
 
-const PORT = process.env.PORT || 4000;
 
-app.listen(PORT, () =>{
-    console.log(`run in -p ${ PORT }`)
-} )
+dotenv.config();
+
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.use(cors());
+app.use(helmet());
+app.use(express.json());
+
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, 
+    max: 100, 
+    message: 'Too many requests from this IP, please try again later.', 
+    headers: true, 
+});
+
+
+
+app.use(limiter);
+app.use('/api', router, limiter);
+ 
+app.listen(port, () => {
+    console.log(`Server is running on port http://localhost:${port}`);
+});

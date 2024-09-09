@@ -1,0 +1,37 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Sidebar from '../components/Side.astro';
+import MapWithMarkers from '../components/map.astro';
+
+const markers = [
+  { lat: -34.397, lng: 150.644, info: "Lugar 1: Información sobre este sitio" },
+  { lat: -34.297, lng: 150.744, info: "Lugar 2: Más detalles sobre otro sitio" }
+];
+// Aquí podrías tener lógica para verificar el rol del usuario
+const isAdmin = false;
+---
+<Layout title="Welcome to Astro.">
+  <main class="flex">
+    
+    <Sidebar isAdmin={isAdmin} />
+    
+    
+    <div class="map w-11/12 h-full">
+		<MapWithMarkers markers={markers} />
+    </div>
+  </main>
+</Layout>
+
+
+<style>
+	
+	.map {
+	  flex-grow: 1; 
+	  height: 100vh; 
+	}
+  
+	main {
+	  justify-content: flex-start; 
+	  align-items: flex-start;     
+	}
+  </style>
