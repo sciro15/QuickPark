@@ -1,0 +1,77 @@
+---
+export interface Marker {
+  lat: number;
+  lng: number;
+  info: string;
+}
+
+// Este componente ahora recibe los marcadores desde el frontmatter de Astro
+const markers: Marker[] = Astro.props.markers;
+---
+
+<!-- Contenedor del mapa -->
+<div id="map" class="w-full h-full" data-markers={JSON.stringify(markers)}></div>
+
+<!-- Cargar el script y inicializar el mapa -->
+<script type="text/javascript">
+  const loadMapScript = () => {
+    return new Promise((resolve, reject) => {
+      if (window.google) {
+        resolve(); // El script ya está cargado
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCUh1x87CO7CnavPoYg8Onq0IEH1ck-3hM&callback=initMap';
+      script.async = true;
+      script.defer = true;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Failed to load Google Maps API'));
+      document.body.appendChild(script);
+    });
+  };
+
+  const initMap = (markers) => {
+    const mapElement = document.getElementById('map');
+    if (mapElement && window.google) {
+      const centroMapa = { lat: -34.397, lng: 150.644 };
+      const map = new google.maps.Map(mapElement, {
+        zoom: 8,
+        center: centroMapa,
+      });
+
+      markers.forEach(({ lat, lng, info }) => {
+        const marker = new google.maps.Marker({
+          position: { lat, lng },
+          map,
+        });
+
+        const infoWindow = new google.maps.InfoWindow({
+          content: tittlerinfo,
+        });
+
+        marker.addListener('click', () => {
+          infoWindow.open(map, marker);
+        });
+      });
+    }
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    loadMapScript()
+      .then(() => {
+        const markers = JSON.parse(document.getElementById('map').getAttribute('data-markers'));
+        initMap(markers);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  });
+</script>
+
+<style>
+  #map {
+    height: 100vh; /* El mapa ocupa toda la altura de la pantalla */
+    width: 100%;   /* Ancho completo del contenedor */
+  }
+</style>
