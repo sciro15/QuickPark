@@ -5,6 +5,7 @@ import ParqueaderoRoutes from './ParqueaderoRoutes.js';
 import ServicioRoutes from './ServicioRoutes.js';
 import CalificacionRoutes from './CalificacionRoutes.js';
 import ImagenRoutes from './ImagenRoutes.js';
+import AuthRouter from './authRoutes.js';
 
 const router = express.Router();
 
@@ -15,5 +16,6 @@ router.use('/Parqueadero', ParqueaderoRoutes);
 router.use('/Servicio', ServicioRoutes);
 router.use('/Calificacion', CalificacionRoutes); 
 router.use('/Imagen', ImagenRoutes);  
+router.use('/login', AuthRouter );  
 
 export default router;

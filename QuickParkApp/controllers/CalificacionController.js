@@ -1,4 +1,4 @@
-import Calificacion from "../models/CalificacionModel.Js";
+import Calificacion from "../models/CalificacionModel.js";
 
 class CalificacionController {
     constructor(database) {
