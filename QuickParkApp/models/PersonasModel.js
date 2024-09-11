@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import bcrypt from 'bcrypt'
 class Persona {
     constructor(database) {
         this.database = database;
@@ -37,32 +37,51 @@ class Persona {
         }
     }
 
-    async updatePersona(id, Nombres, Apellidos,Correo,Usuario, Contraseña) {
-        const salt = crypto.randomBytes(16).toString('hex'); 
-        const hash = crypto.pbkdf2Sync(Contraseña, salt, 1000, 64, 'sha512').toString('hex'); 
+    async updatePersona(id, Nombres, Apellidos, Correo, Usuario, Contraseña) {
+        const saltRounds = 10;        
         try {
-            const query = 'UPDATE Persona SET Nombre = ?,Apellidos = ?,Correo = ?, Usuario = ? , Contraseña = ? WHERE id = ?';
-            const [result] = await this.database.query(query, [Nombres, Apellidos,Correo,Usuario,`${salt}:${hash}`, id]);
-            return result;
+          let hashedPassword;
+          if (Contraseña) {
+            // Generar el hash de la nueva contraseña si se proporciona
+            hashedPassword = await bcrypt.hash(Contraseña, saltRounds);
+          }
+      
+          // Actualizar los datos
+          const query = `
+            UPDATE Persona 
+            SET Nombres = ?, Apellidos = ?, Correo = ?, Usuario = ? ${Contraseña ? ', Contraseña = ?' : ''} 
+            WHERE id = ?
+          `;
+          
+          // Prepara los parámetros de la consulta
+          const params = [Nombres, Apellidos, Correo, Usuario];
+          if (hashedPassword) {
+            params.push(hashedPassword);
+          }
+          params.push(id);
+      
+          const [result] = await this.database.query(query, params);
+          return result;
         } catch (err) {
-            console.error('Error en updatePersona:', err);
-            throw err;
+          console.error('Error en updatePersona:', err);
+          throw err;
         }
-    }
+      }
 
-    async addPersona(Nombres, Apellidos,Correo,Usuario, Contraseña) {      
-        const salt = crypto.randomBytes(16).toString('hex'); 
-        const hash = crypto.pbkdf2Sync(Contraseña, salt, 1000, 64, 'sha512').toString('hex'); 
-
+    async addPersona(Nombres, Apellidos, Correo, Usuario, Contraseña) {
+        const saltRounds = 10;
         try {
-            const query = 'INSERT INTO Persona (Nombres , Apellidos ,Correo ,Usuario ,Contraseña) VALUES (?, ?, ?, ?, ?)';
-            const [result] = await this.database.query(query, [Nombres , Apellidos ,Correo ,Usuario ,`${salt}:${hash}`]);
-            return result;
+          // Generar el hash de la contraseña
+          const hashedPassword = await bcrypt.hash(Contraseña, saltRounds);
+      
+          const query = 'INSERT INTO Persona (Nombres, Apellidos, Correo, Usuario, Contraseña) VALUES (?, ?, ?, ?, ?)';
+          const [result] = await this.database.query(query, [Nombres, Apellidos, Correo, Usuario, hashedPassword]);
+          return result;
         } catch (err) {
-            console.error('Error en addPersona:' , err);
-            throw err;
+          console.error('Error en addPersona:', err);
+          throw err;
         }
-    }
+      }
 }
 
 export default Persona;
