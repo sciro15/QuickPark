@@ -1,0 +1,60 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<div class="bg-gradient-to-r from-gray-100 to-green-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-lg flex w-11/10 md:w-2/3 max-w-5xl">
+      <div class="w-full md:w-1/2 p-6 bg-black text-white rounded-l-lg">
+        <h2 class="text-xl font-bold mb-2">Agrega un Parqueadero</h2>
+        <p class="text-xs mb-4">Agrega tu parqueadero y hazlo visible para miles de usuarios en nuestra plataforma.</p>
+  
+        <form>
+          <label class="block text-xs font-semibold mb-1">Nombre del Parqueadero</label>
+          <input type="text" class="w-full mb-2 p-1 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nombre del Parqueadero">
+  
+          <label class="block text-xs font-semibold mb-1">Direccion</label>
+          <input type="text" class="w-full mb-2 p-1 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Direccion">
+  
+         
+          <div class="flex space-x-2">
+            <div class="w-1/2">
+              <label class="block text-xs font-semibold mb-1">Ciudad</label>
+              <input type="text" class="w-full mb-2 p-1 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ciudad">
+            </div>
+            <div class="w-1/2">
+              <label class="block text-xs font-semibold mb-1">Codigo Postal</label>
+              <input type="text" class="w-full mb-2 p-1 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Codigo Postal">
+            </div>
+          </div>
+  
+       
+          <label class="block text-xs font-semibold mb-1">Numero de Contacto</label>
+          <input type="text" class="w-full mb-2 p-1 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Numero de Contacto">
+  
+      
+          <label class="block text-xs font-semibold mb-1">Correo Electronico</label>
+          <input type="email" class="w-full mb-2 p-1 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Correo Electronico">
+  
+         
+          <label class="block text-xs font-semibold mb-1">Precio por Hora</label>
+          <input type="number" class="w-full mb-2 p-1 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Precio por Hora">
+  
+         
+          <label class="block text-xs font-semibold mb-1">Registro autorizado de parqueadero</label>
+          <div class="border border-dashed p-2 rounded mb-2">
+            <input type="file" class="block w-full text-white file:bg-blue-500 file:px-2 file:py-1 file:rounded-md file:border-none file:text-white hover:file:bg-blue-600">
+          </div>
+          <div class="flex items-center mb-4">
+            <input type="checkbox" id="terms" class="mr-1">
+            <label for="terms" class="text-xs">Acepto Terminos y Condiciones</label>
+          </div>
+          <button class="w-full bg-blue-500 text-white py-1 rounded hover:bg-blue-600">REGISTRAR MI PARQUEADERO</button>
+        </form>
+      </div>
+  
+    
+      <div class="hidden md:block w-1/2">
+        <iframe class="w-full h-full rounded-r-lg" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.7147253562266!2d-75.56359108584033!3d6.2480702954873395!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e4429d07f7b8fd9%3A0xf94f4dd639ae178e!2sMedellin%2C%20Antioquia%2C%20Colombia!5e0!3m2!1ses!2sco!4v1637687049348!5m2!1ses!2sco" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+      </div>
+    </div>
+  </div>
+  

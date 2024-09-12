@@ -1,0 +1,64 @@
+---
+
+import Layout from '../layouts/Layout.astro';
+---
+<div class="container mx-auto p-4 bg-gradient-to-r from-gray-100 to-green-100 min-h-screen flex flex-col items-center justify-center">
+    <div class="flex justify-center w-full max-w-4xl">
+        <div class="w-2/3 bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold mb-4 flex items-center">
+                <span class="material-icons mr-2"></span>
+                Parquederos Visitados
+            </h2>
+
+           
+            <div class="space-y-6">
+             
+                <div class="flex items-center space-x-4">
+                    <img src="./public/Pq.jpg" alt="Parqueadero Central" class="w-24 h-24 rounded-lg object-cover">
+                    <div>
+                        <h3 class="text-xl font-semibold">Parqueadero Central</h3>
+                        <p>Direccion: Calle 10 #25-30, Medellin</p>
+                        <p>Dia de Visita: 16 de agosto de 2024</p>
+                        <p>Hora de Entrada: 8:30 AM</p>
+                        <p>Hora de Salida: 5:45 PM</p>
+                        <p>Tarifa Aplicada: $12.000</p>
+                    </div>
+                </div>
+
+               
+                <div class="flex items-center space-x-4">
+                    <img src="./public/pq1.jpg" alt="Parqueadero El Bosque" class="w-24 h-24 rounded-lg object-cover">
+                    <div>
+                        <h3 class="text-xl font-semibold">Parqueadero El Bosque</h3>
+                        <p>Direccion: Carrera 50 #20-15, Medellin</p>
+                        <p>Dia de Visita: 22 de agosto de 2024</p>
+                        <p>Hora de Entrada: 9:45 AM</p>
+                        <p>Hora de Salida: 4:30 PM</p>
+                        <p>Tarifa Aplicada: $10.500</p>
+                    </div>
+                </div>
+
+               
+                <div class="flex items-center space-x-4">
+                    <img src="./public/pq2.jpg" alt="Estacionamiento La Esperanza" class="w-24 h-24 rounded-lg object-cover">
+                    <div>
+                        <h3 class="text-xl font-semibold">Estacionamiento La Esperanza</h3>
+                        <p>Direccion: Avenida 8 #12-19, Cali</p>
+                        <p>Dia de Visita: 10 de agosto de 2024</p>
+                        <p>Hora de Entrada: 10:00 AM</p>
+                        <p>Hora de Salida: 6:00 PM</p>
+                        <p>Tarifa Aplicada: $9.000</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       <div class="w-1/3 bg-[#0ACF9B] p-6 rounded-lg shadow-md">
+            <div class="relative">
+                <input
+                    type="text"
+                    placeholder="Buscar"
+                    class="w-full py-2 px-4 rounded-full pl-10 pr-12 focus:outline-none focus:ring-2 focus:ring-teal-600"/>            </div>
+        </div>
+    </div>
+</div>
