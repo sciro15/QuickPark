@@ -5,12 +5,16 @@ import jwt from 'jsonwebtoken';
 
 dotenv.config();
 
-// Cantidad de rondas de salt (10 es un valor razonable)
-
-
+// Verifica el contenido de la contraseña y el hash
 const comparePasswords = async (plainTextPassword, hashedPassword) => {
+  console.log('Contraseña en texto plano:', plainTextPassword);
+  console.log('Contraseña hasheada:', hashedPassword);
+
   try {
     // bcrypt.compare compara directamente la contraseña ingresada con la almacenada
+    if (!plainTextPassword || !hashedPassword) {
+      throw new Error('Contraseña en texto plano o hash de contraseña no proporcionados');
+    }
     const isMatch = await bcrypt.compare(plainTextPassword, hashedPassword);
     console.log('Resultado de la comparación:', isMatch); // Log para verificar el resultado
     return isMatch;
@@ -21,16 +25,17 @@ const comparePasswords = async (plainTextPassword, hashedPassword) => {
 };
 
 const authenticateUser = async (req, res) => {
-  console.log(req.body);
-
+  console.log('Datos de la solicitud:', req.body);
+  
   const { Usuario, Contraseña } = req.body;
-
+  console.log(Usuario, Contraseña); //
   try {
     // Buscar en la tabla de Administrador
     const [admin] = await db.query('SELECT * FROM Administrador WHERE Usuario = ?', [Usuario]);
 
     if (admin && admin.length > 0) {
       const adminRecord = admin[0];
+      console.log('Registro de administrador:', adminRecord); // Verifica el contenido del registro
       const isPasswordValid = await comparePasswords(Contraseña, adminRecord.Contraseña);
 
       if (isPasswordValid) {
@@ -46,6 +51,7 @@ const authenticateUser = async (req, res) => {
 
     if (persona && persona.length > 0) {
       const personaRecord = persona[0];
+      console.log('Registro de persona:', personaRecord); // Verifica el contenido del registro
       const isPasswordValid = await comparePasswords(Contraseña, personaRecord.Contraseña);
 
       if (isPasswordValid) {
