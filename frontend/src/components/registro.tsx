@@ -48,7 +48,7 @@ const Register = () => {
   return (
     <div
       className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed flex justify-center items-center"
-      style={{ backgroundImage: 'url("/images/fond.png")' }} // Usa la misma imagen de fondo
+      style={{ backgroundImage: 'url("/images/fond.png")' }} 
     >
       <div className="bg-gray-800 text-white bg-opacity-90 rounded-lg shadow-lg p-10 max-w-lg w-full">
         <div className="text-center mb-6">
