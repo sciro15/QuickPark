@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import router from './routes/app.js';
+import session from 'express-session';
 
 
 dotenv.config();
@@ -23,6 +24,17 @@ const limiter = rateLimit({
     headers: true, 
 });
 
+app.use(session({
+    secret: process.env.SESSION_SECRET, // Llave secreta para firmar la cookie
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      secure: process.env.SESSION_SECRET, // true en producción (requiere HTTPS)
+      httpOnly: true, // Evita que el cliente acceda a la cookie (mejora la seguridad)
+      maxAge: 60 * 60 * 1000, // 1 hora de expiración
+      sameSite: 'lax' // Configura la política de SameSite
+    }
+  }));
 
 
 app.use(limiter);

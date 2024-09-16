@@ -37,12 +37,29 @@ class Administrador {
         }
     }
 
-    async updateAdministrador(id, Nombres, Apellidos,Correo,Usuario, Contraseña) {
-        const salt = crypto.randomBytes(16).toString('hex'); 
-        const hash = crypto.pbkdf2Sync(Contraseña, salt, 1000, 64, 'sha512').toString('hex'); 
+    async updateAdministrador(id, Nombres, Apellidos, Correo, Usuario, Contraseña) {
         try {
-            const query = 'UPDATE Administrador SET Nombre = ?,Apellidos = ?,Correo = ?, Usuario = ? , Contraseña = ? WHERE id = ?';
-            const [result] = await this.database.query(query, [Nombres, Apellidos,Correo,Usuario,`${salt}:${hash}`, id]);
+            const saltRounds = 10;
+            // Generar el hash de la nueva contraseña si se proporciona una
+            let hashedPassword;
+            if (Contraseña) {
+                hashedPassword = await bcrypt.hash(Contraseña, saltRounds);
+            }
+    
+            const query = `
+                UPDATE Administrador 
+                SET Nombre = ?, Apellidos = ?, Correo = ?, Usuario = ? ${Contraseña ? ', Contraseña = ?' : ''} 
+                WHERE id = ?
+            `;
+            
+            // Construir los parámetros dinámicamente
+            const params = [Nombres, Apellidos, Correo, Usuario];
+            if (hashedPassword) {
+                params.push(hashedPassword);
+            }
+            params.push(id);
+    
+            const [result] = await this.database.query(query, params);
             return result;
         } catch (err) {
             console.error('Error en updateAdministrador:', err);
@@ -50,16 +67,17 @@ class Administrador {
         }
     }
 
-    async addAdministrador(Nombres, Apellidos,Correo,Usuario, Contraseña) {      
-        const salt = crypto.randomBytes(16).toString('hex'); 
-        const hash = crypto.pbkdf2Sync(Contraseña, salt, 1000, 64, 'sha512').toString('hex'); 
-
+    async addAdministrador(Nombres, Apellidos, Correo, Usuario, Contraseña) {
+        const saltRounds = 10;
         try {
-            const query = 'INSERT INTO Administrador (Nombres , Apellidos ,Correo ,Usuario ,Contraseña) VALUES (?, ?, ?, ?, ?)';
-            const [result] = await this.database.query(query, [Nombres , Apellidos ,Correo ,Usuario ,`${salt}:${hash}`]);
+            // Generar el hash de la contraseña usando bcrypt
+            const hashedPassword = await bcrypt.hash(Contraseña, saltRounds);
+    
+            const query = 'INSERT INTO Administrador (Nombres, Apellidos, Correo, Usuario, Contraseña) VALUES (?, ?, ?, ?, ?)';
+            const [result] = await this.database.query(query, [Nombres, Apellidos, Correo, Usuario, hashedPassword]);
             return result;
         } catch (err) {
-            console.error('Error en addPersona:' , err);
+            console.error('Error en addAdministrador:', err);
             throw err;
         }
     }
