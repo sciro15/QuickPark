@@ -52,10 +52,10 @@ const Ingreso = () => {
   return (
     <div className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed flex justify-center items-center"
       style={{ backgroundImage: 'url("/images/fond.png")' }}>
-      <div className="bg-gray-800 text-white bg-opacity-80 rounded-lg shadow-lg p-10 max-w-md w-full">
+      <div className="bg-gray-800 text-white bg-opacity-80 rounded-lg shadow-lg p-6 sm:p-10 w-full max-w-sm sm:max-w-md lg:max-w-lg">
         <div className="text-center mb-6">
-          <img src="/images/Logo.png" alt="Logo QuickPark" className="mx-auto h-16" />
-          <h2 className="text-2xl font-bold mt-4">Inicio de Sesión</h2>
+          <img src="/images/Logo.png" alt="Logo QuickPark" className="mx-auto h-12 sm:h-16" />
+          <h2 className="text-xl sm:text-2xl font-bold mt-4">Inicio de Sesión</h2>
         </div>
 
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
@@ -92,7 +92,7 @@ const Ingreso = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 sm:py-3 rounded"
             disabled={loading}
           >
             {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
