@@ -4,3 +4,5 @@ interface Window {
   interface Window {
     initMap: () => void;
   }
+
+  

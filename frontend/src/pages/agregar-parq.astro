@@ -2,6 +2,7 @@
 import AgregarParqueadero from '../components/agregar-parq.tsx';
 import '../styles/global.css';
 ---
+
 <html lang="es">
   <head>
     <title>QuickPark - Registro</title>
@@ -10,7 +11,8 @@ import '../styles/global.css';
   </head>
   <body>
     <main>
-      <AgregarParqueadero client:load/>
+      <!-- Pasar el AdministradorID como prop a AgregarParqueadero -->
+      <AgregarParqueadero client:load />
     </main>
   </body>
 </html>
