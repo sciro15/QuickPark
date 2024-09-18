@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 
-
 const Register = () => {
   const [Usuario, setUsuario] = useState("");
   const [Contraseña, setContraseña] = useState("");
@@ -13,7 +12,6 @@ const Register = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log("Entró en handleSubmit");
     if (!Usuario || !Contraseña || !Nombres || !Apellidos || !Correo ) {
       setError("Por favor, completa los campos");
       return;
@@ -28,7 +26,7 @@ const Register = () => {
           "Content-Type": "application/json",
           "Authorization": "", // Añadir la clave API en el header
         },
-        body: JSON.stringify({ Nombres,Apellidos,Correo,Usuario,Contraseña }),
+        body: JSON.stringify({ Nombres, Apellidos, Correo, Usuario, Contraseña }),
       });
 
       if (response.ok) {
@@ -39,7 +37,7 @@ const Register = () => {
       }
     } catch (error) {
       console.error("Error en el Registro:", error);
-      setError("Error de Regiostro");
+      setError("Error de Registro");
     } finally {
       setLoading(false);
     }
@@ -47,17 +45,17 @@ const Register = () => {
 
   return (
     <div
-      className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed flex justify-center items-center"
+      className="min-h-screen bg-cover bg-center bg-no-repeat flex justify-center items-center px-4 py-6"
       style={{ backgroundImage: 'url("/images/fond.png")' }} 
     >
-      <div className="bg-gray-800 text-white bg-opacity-90 rounded-lg shadow-lg p-10 max-w-lg w-full">
+      <div className="bg-gray-800 text-white bg-opacity-90 rounded-lg shadow-lg p-6 sm:p-8 md:p-10 max-w-md w-full">
         <div className="text-center mb-6">
           <img
             src="images/Logo.png" 
             alt="Logo QuickPark"
-            className="mx-auto h-16"
+            className="mx-auto h-12 sm:h-16"
           />
-          <h2 className="text-2xl font-bold mt-4">Registro</h2>
+          <h2 className="text-xl sm:text-2xl font-bold mt-4">Registro</h2>
         </div>
 
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
@@ -103,7 +101,8 @@ const Register = () => {
               placeholder="Correo electrónico"
             />
           </div>
-          {/* Campo de Email */}
+          
+          {/* Campo de Usuario */}
           <div className="mb-4">
             <label className="block text-gray-300">Usuario</label>
             <input
@@ -116,6 +115,7 @@ const Register = () => {
               placeholder="Usuario"
             />
           </div>
+          
           {/* Campo de Contraseña */}
           <div className="mb-4">
             <label className="block text-gray-300">Contraseña</label>
@@ -130,7 +130,7 @@ const Register = () => {
             />
           </div>   
 
-          {/* Checkboxes para aceptar términos */}
+          {/* Checkbox para aceptar términos */}
           <div className="mb-4">
             <label className="flex items-center">
               <input
@@ -145,15 +145,14 @@ const Register = () => {
             type="submit"
             disabled={loading}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded"
-            >
+          >
             {loading ? "Registrando..." : "Registrar"}
-          
           </button>
         </form>
 
         <p className="text-center text-gray-400 mt-6">
           ¿Ya tienes cuenta?{" "}
-          <a href="/Login?" className="text-blue-500">
+          <a href="/Login" className="text-blue-500">
             Inicia sesión
           </a>
         </p>

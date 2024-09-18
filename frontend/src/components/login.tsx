@@ -56,10 +56,10 @@ const Ingreso = () => {
       className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed flex justify-center items-center"
       style={{ backgroundImage: 'url("/images/fond.png")' }}
     >
-      <div className="bg-gray-800 text-white bg-opacity-80 rounded-lg shadow-lg p-10 max-w-md w-full">
+      <div className="bg-gray-800 text-white bg-opacity-80 rounded-lg shadow-lg p-8 md:p-10 max-w-xs sm:max-w-md md:max-w-lg w-full">
         <div className="text-center mb-6">
           <img src="/images/Logo.png" alt="Logo QuickPark" className="mx-auto h-16" />
-          <h2 className="text-2xl font-bold mt-4">Inicio de Sesión</h2>
+          <h2 className="text-xl md:text-2xl font-bold mt-4">Inicio de Sesión</h2>
         </div>
 
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
@@ -75,7 +75,7 @@ const Ingreso = () => {
               name="usuario"
               value={usuario}
               onChange={(e) => setUsuario(e.target.value)}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
+              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
               placeholder="Usuario"
               autoComplete="username"
             />
@@ -90,13 +90,13 @@ const Ingreso = () => {
               name="contrasena"
               value={contrasena}
               onChange={(e) => setContrasena(e.target.value)}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
+              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
               placeholder="Contraseña"
               autoComplete="current-password"
             />
           </div>
-          <div className="flex justify-between mb-6">
-            <a href="#" className="text-sm text-blue-500">
+          <div className="flex justify-between mb-6 text-sm">
+            <a href="#" className="text-blue-500">
               ¿Olvidaste tu contraseña?
             </a>
           </div>
@@ -109,7 +109,7 @@ const Ingreso = () => {
           </button>
         </form>
 
-        <p className="text-center text-gray-400 mt-4">
+        <p className="text-center text-gray-400 mt-4 text-sm md:text-base">
           ¿No tienes cuenta?{" "}
           <a href="/registro" className="text-blue-500">
             Regístrate gratis
@@ -120,4 +120,4 @@ const Ingreso = () => {
   );
 };
 
-export default Ingreso;
+export default Ingreso;
