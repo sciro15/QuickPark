@@ -27,6 +27,85 @@ const adminLinks = [
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sidebar</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    .Sidebar {
+      background-color: #1c2222;
+      border-radius: 0.5rem 0.5rem 0 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      padding: 1rem;
+      transition: transform 0.3s ease-in-out;
+      width: 100%; /* Cambiar a 100% en pantallas pequeñas */
+      max-width: 27rem; /* Ancho máximo del sidebar */
+      bottom: 130px; /* Ajusta la posición desde el borde inferior para que quede más arriba */
+      position: absolute;
+      left: 0; /* Alinea el sidebar a la izquierda */
+    }
+
+    #sidebarContent {
+      width: 100%; /* Asegura que el contenido del sidebar tenga el mismo ancho */
+    }
+
+    .translate-y-full {
+      transform: translateY(100%);
+    }
+
+    .translate-y-0 {
+      transform: translateY(0);
+    }
+
+    .handle {
+      top: 1rem; /* Ajusta la posición de la rayita más cerca del borde superior del sidebar */
+      z-index: 60; /* Asegura que la rayita esté sobre el contenido del sidebar */
+      cursor: pointer;
+    }
+
+    /* Estilos para la barra de desplazamiento */
+    #sidebarContent::-webkit-scrollbar {
+      width: 8px; /* Ancho de la barra de desplazamiento */
+    }
+
+    #sidebarContent::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.3); /* Color del "dedo" de la barra de desplazamiento */
+      border-radius: 10px; /* Bordes redondeados del "dedo" */
+    }
+
+    #sidebarContent::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1); /* Color del fondo de la barra de desplazamiento */
+      border-radius: 10px; /* Bordes redondeados del track */
+    }
+
+    /* Media queries para pantallas pequeñas */
+    @media (max-width: 768px) {
+      .Sidebar {
+        width: 100%;
+        max-width: none; /* Quita el ancho máximo en pantallas pequeñas */
+      }
+
+      .handle {
+        display: block; /* Muestra la rayita en pantallas pequeñas */
+      }
+
+      /* Alinea el contenido al centro */
+      #sidebarContent {
+        width: 100%;
+      }
+    }
+
+    /* Media queries para pantallas medianas */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .Sidebar {
+        max-width: 20rem; /* Ajusta el ancho máximo para pantallas medianas */
+      }
+    }
+
+    /* Media queries para pantallas grandes */
+    @media (min-width: 1025px) {
+      .Sidebar {
+        left: 1rem; /* Ajusta la posición desde el borde izquierdo para pantallas grandes */
+        max-width: 25rem; /* Puedes ajustar el ancho máximo según sea necesario */
+      }
+    }
+  </style>
 </head>
 <body>
   <aside class="Sidebar fixed bottom-8 left-4 z-50 flex flex-col bg-gray-800 rounded-t-lg shadow-lg transition-transform transform translate-y-full">
@@ -123,49 +202,5 @@ const adminLinks = [
       }
     });
   </script>
-
-  <style>
-    .Sidebar {
-      background-color: #1c2222;
-      border-radius: 0.5rem 0.5rem 0 0;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-      padding: 1rem;
-      transition: transform 0.3s ease-in-out;
-      width: 27rem; /* Ancho del sidebar */
-      bottom: 130px; /* Ajusta la posición desde el borde inferior para que quede más arriba */
-    }
-
-    #sidebarContent {
-      width: 100%; /* Asegura que el contenido del sidebar tenga el mismo ancho */
-    }
-
-    .translate-y-full {
-      transform: translateY(100%);
-    }
-
-    .translate-y-0 {
-      transform: translateY(0);
-    }
-
-    .handle {
-      top: 1rem; /* Ajusta la posición de la rayita más cerca del borde superior del sidebar */
-      z-index: 60; /* Asegura que la rayita esté sobre el contenido del sidebar */
-    }
-
-    /* Estilos para la barra de desplazamiento */
-    #sidebarContent::-webkit-scrollbar {
-      width: 8px; /* Ancho de la barra de desplazamiento */
-    }
-
-    #sidebarContent::-webkit-scrollbar-thumb {
-      background-color: rgba(255, 255, 255, 0.3); /* Color del "dedo" de la barra de desplazamiento */
-      border-radius: 10px; /* Bordes redondeados del "dedo" */
-    }
-
-    #sidebarContent::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.1); /* Color del fondo de la barra de desplazamiento */
-      border-radius: 10px; /* Bordes redondeados del track */
-    }
-  </style>
 </body>
 </html>

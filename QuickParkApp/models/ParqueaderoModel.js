@@ -40,33 +40,106 @@ class Parqueadero {
     }
 
     // Actualizar un parqueadero
-    async updateParqueadero(id, Nombre, Texto, AdministradorID, Direccion, Telefono, Correo, Precio) {
+    // En tu archivo del modelo
+
+  
+    async addParqueadero(
+        Nombre,
+        Direccion,
+        Telefono,
+        Correo,
+        lat,
+        lng,
+        AdministradorID,
+        TarifaHora,
+        TarifaDia,
+        TarifaMensual,
+        Descripcion,
+        Servicios,
+        Caracteristicas,
+        ImagenPortada = null // Valor predeterminado si no se pasa
+    ) {
         const query = `
-            UPDATE Parqueadero 
-            SET Nombre = ?, Texto = ?, AdministradorID = ?, Direccion = ?, Telefono = ?, Correo = ?, Precio = ? 
-            WHERE id = ?`;
+            INSERT INTO Parqueadero 
+            (Nombre, Direccion, Telefono, Correo, lat, lng, AdministradorID, TarifaHora, TarifaDia, TarifaMensual, Descripcion, Servicios, Caracteristicas, ImagenPortada)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+    
+        // Asegúrate de que todos los valores no sean undefined, reemplazando undefined por null
+        const values = [
+            Nombre || null,
+            Direccion || null,
+            Telefono || null,
+            Correo || null,
+            lat || null,
+            lng || null,
+            AdministradorID || null,
+            TarifaHora || null,
+            TarifaDia || null,
+            TarifaMensual || null,
+            Descripcion || null,
+            Servicios ? JSON.stringify(Servicios) : null,  // JSON string of services
+            Caracteristicas ? JSON.stringify(Caracteristicas) : null, // JSON string of characteristics
+            ImagenPortada || null // ImagenPortada se permite null si es opcional
+        ];
+    
         try {
-            const [result] = await this.database.query(query, [Nombre, Texto, AdministradorID, Direccion, Telefono, Correo, Precio, id]);
-            return result;
-        } catch (err) {
-            console.error('Error en updateParqueadero:', err);
-            throw err;
+            const [result] = await this.database.execute(query, values); // Asegúrate de que this.database se está utilizando correctamente
+            return result;  // Aquí debería tener `insertId`
+        } catch (error) {
+            console.error("Error al agregar parqueadero:", error);
+            throw error;
         }
+    }
+    
+  
+  
+
+    async updateParqueadero(
+        id,
+        Nombre,
+        Direccion,
+        Telefono,
+        Correo,
+        lat,
+        lng,
+        AdministradorID,
+        TarifaHora,
+        TarifaDia,
+        TarifaMensual,
+        Descripcion,
+        Servicios,
+        Caracteristicas,
+        ImagenPortada
+    ) {
+        const query = `
+            UPDATE parqueaderos
+            SET Nombre = ?, Direccion = ?, Telefono = ?, Correo = ?, lat = ?, lng = ?, AdministradorID = ?, TarifaHora = ?, TarifaDia = ?, TarifaMensual = ?, Descripcion = ?, Servicios = ?, Caracteristicas = ?, ImagenPortada = ?
+            WHERE id = ?
+        `;
+
+        const values = [
+            Nombre,
+            Direccion,
+            Telefono,
+            Correo,
+            lat,
+            lng,
+            AdministradorID,
+            TarifaHora,
+            TarifaDia,
+            TarifaMensual,
+            Descripcion,
+            Servicios,
+            Caracteristicas,
+            ImagenPortada,
+            id
+        ];
+
+        return this.database.query(query, values);
     }
 
-    // Agregar un nuevo parqueadero
-    async addParqueadero(Nombre, Texto, AdministradorID, Direccion, Telefono, Correo, Precio) {
-        const query = `
-            INSERT INTO Parqueadero (Nombre, Texto, AdministradorID, Direccion, Telefono, Correo, Precio) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)`;
-        try {
-            const [result] = await this.database.query(query, [Nombre, Texto, AdministradorID, Direccion, Telefono, Correo, Precio]);
-            return result;
-        } catch (err) {
-            console.error('Error en addParqueadero:', err);
-            throw err;
-        }
-    }
+    // Otros métodos como obtener, eliminar si es necesario
 }
 
 export default Parqueadero;

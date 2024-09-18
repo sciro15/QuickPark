@@ -8,16 +8,15 @@ const AgregarTarifasServicios: React.FC = () => {
   const [Servicios, setServicios] = useState<string[]>([]);
   const [Caracteristicas, setCaracteristicas] = useState<string[]>([]);
 
-  // Servicios predefinidos
+  // Servicios y características predefinidos
   const serviciosOpciones = ['Lavado de Autos', 'Vigilancia 24/7', 'Cargador Eléctrico', 'Valet Parking'];
-  
-  // Características predefinidas
   const caracteristicasOpciones = ['Techo Cubierto', 'Cámaras de Seguridad', 'Parqueo para Discapacitados', 'Espacios Amplios'];
 
   useEffect(() => {
     const storedData = localStorage.getItem('parqueaderoData');
     if (storedData) {
       const data = JSON.parse(storedData);
+      console.log('Datos almacenados en localStorage:', data); // Muestra los datos almacenados
       setTarifaHora(data.TarifaHora || "");
       setTarifaDia(data.TarifaDia || "");
       setTarifaMensual(data.TarifaMensual || "");
@@ -47,7 +46,7 @@ const AgregarTarifasServicios: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     // Crear un objeto para almacenar los datos
     const parqueaderoData = {
       TarifaHora,
@@ -57,42 +56,46 @@ const AgregarTarifasServicios: React.FC = () => {
       Servicios,
       Caracteristicas,
     };
-  
+
     // Obtener datos de la vista anterior desde localStorage
     const vistaAnteriorData = JSON.parse(localStorage.getItem('parqueaderoData') || '{}');
-    
+
     // Combinamos los datos de ambas vistas
     const combinedData = {
       ...vistaAnteriorData,
       ...parqueaderoData,
     };
 
-       
-      
-        // Enviar los datos desglosados al servidor en formato JSON
-        try {
-          const response = await fetch('http://localhost:2402/api/Parqueadero/parqueadero', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(combinedData), // Convertir los datos a JSON
-          });
-      
-          if (!response.ok) {
-            throw new Error('Error al enviar los datos');
-          }
-      
-          const result = await response.json();
-          console.log("Datos enviados:", combinedData); // Mostrar los datos enviados
-          alert('Datos guardados correctamente en el servidor');
-          console.log("Respuesta del servidor:", result);
-        } catch (error) {
-          console.error('Error en la solicitud:', error);
-          alert('Error al guardar los datos en el servidor');
-        }
-};
-  
+    // Convertir los datos combinados a JSON y almacenarlos en localStorage
+    localStorage.setItem('parqueaderoData', JSON.stringify(combinedData));
+
+    console.log("Datos combinados antes de enviar:", combinedData); // Muestra los datos combinados
+
+    // Enviar los datos desglosados al servidor en formato JSON
+    try {
+      const response = await fetch('http://localhost:2402/api/Parqueadero/parqueadero', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(combinedData), // Convertir los datos a JSON
+      });
+
+      if (!response.ok) {
+        const errorDetails = await response.text();
+        console.error('Error en la respuesta del servidor:', errorDetails);
+        throw new Error('Error al enviar los datos');
+      }
+
+      const result = await response.json();
+      console.log("Datos enviados:", combinedData); // Mostrar los datos enviados
+      alert('Datos guardados correctamente en el servidor');
+      console.log("Respuesta del servidor:", result);
+    } catch (error) {
+      console.error('Error en la solicitud:', error);
+      alert('Error al guardar los datos en el servidor');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-cover bg-center flex justify-center items-center" style={{ backgroundImage: 'url("/images/fond.png")' }}>
@@ -160,7 +163,6 @@ const AgregarTarifasServicios: React.FC = () => {
               />
               <p>{Descripcion && `Descripción: ${Descripcion}`}</p>
             </div>
-            
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
