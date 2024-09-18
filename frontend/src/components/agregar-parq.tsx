@@ -1,48 +1,43 @@
-import React, { useEffect, useRef,useState } from 'react';
-const AgregarParqueadero: React.FC = () => {
+import React, { useEffect, useRef, useState } from 'react';
 
-  const [Nombre, setNombre] = useState("");
-  const [Direccion, setDireccion] = useState("");
-  const [Telefono, setTelefono] = useState("");
-  const [Correo, setCorreo] = useState("");
-  const [Precio, setPrecio] = useState("");
-  const [error, setError] = useState("");
+const AgregarParqueadero: React.FC = () => {
+  const [Nombre, setNombre] = useState('');
+  const [Direccion, setDireccion] = useState('');
+  const [Telefono, setTelefono] = useState('');
+  const [Correo, setCorreo] = useState('');
+  const [lat, setLat] = useState<number | null>(null);
+  const [lng, setLng] = useState<number | null>(null);
+  const [Ciudad, setCiudad] = useState('');
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+ 
+  const direccionInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log("Entró en handleSubmit");
-    if (!Nombre || !Direccion || !Telefono || !Correo || !Precio ) {
-      setError("Por favor, completa los campos");
+    if (!Nombre || !Direccion || !Telefono || !Correo || lat === null || lng === null || !Ciudad) {
+      setError('Por favor, completa todos los campos.');
       return;
     }
+
     setLoading(true);
-    setError(""); // Limpiar error antes de la solicitud
+    setError('');
 
     try {
-      const response = await fetch("http://localhost:2402/api/Parqueadero/parqueadero", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "", // Añadir la clave API en el header
-        },
-        body: JSON.stringify({ Nombre, Direccion, Telefono, Correo, Precio }),
-      });
+      // Guardar los datos en el localStorage o en el estado global
+      localStorage.setItem('parqueaderoData', JSON.stringify({ Nombre, Direccion, Telefono, Correo, lat, lng, Ciudad }));
 
-      if (response.ok) {
-        window.location.replace("/Folleto"); // Redirigir al usuario después del Registro exitoso
-      } else {
-        const result = await response.json();
-        setError(typeof result.error === 'string' ? result.error : "Error de Registro");
-      }
+      // Redirigir a la vista de confirmación o envío
+      window.location.href = '/enviar-parq'; // Cambia la URL según tu configuración
     } catch (error) {
-      console.error("Error en el Registro:", error);
-      setError("Error de Regiostro");
+      console.error('Error en el Registro:', error);
+      setError('Error al obtener la ubicación. Asegúrate de que la dirección sea válida.');
     } finally {
       setLoading(false);
     }
   };
+
   // Referencia para almacenar el mapa y el marcador actual
   const mapRef = useRef<google.maps.Map | null>(null);
   const markerRef = useRef<google.maps.Marker | null>(null);
@@ -56,7 +51,8 @@ const AgregarParqueadero: React.FC = () => {
         }
 
         const script = document.createElement('script');
-        script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCUh1x87CO7CnavPoYg8Onq0IEH1ck-3hM&libraries=places&callback=initMap';
+        script.src =
+          'https://maps.googleapis.com/maps/api/js?key=AIzaSyCUh1x87CO7CnavPoYg8Onq0IEH1ck-3hM&libraries=places&callback=initMap';
         script.async = true;
         script.defer = true;
         script.onload = () => resolve();
@@ -78,13 +74,13 @@ const AgregarParqueadero: React.FC = () => {
         mapRef.current = map;
 
         // Inicializa el autocompletado
-        const placeInput = document.getElementById('Direccion') as HTMLInputElement;
+        const placeInput = direccionInputRef.current; // Referencia al input de dirección
         if (placeInput) {
           const autocomplete = new window.google.maps.places.Autocomplete(placeInput);
           autocomplete.addListener('place_changed', () => {
             const place = autocomplete.getPlace();
             if (!place.geometry || !place.geometry.location) {
-              console.log("No se ha encontrado una ubicación válida");
+              console.log('No se ha encontrado una ubicación válida');
               return;
             }
 
@@ -102,6 +98,25 @@ const AgregarParqueadero: React.FC = () => {
             // Guarda la referencia al nuevo marcador
             markerRef.current = newMarker;
 
+            // Actualizar latitud, longitud y dirección en el estado
+            const newLat = place.geometry.location.lat();
+            const newLng = place.geometry.location.lng();
+            setLat(newLat);
+            setLng(newLng);
+            setDireccion(place.formatted_address || ''); // Aquí se actualiza solo al seleccionar un lugar
+
+            // Extraer la ciudad de los address_components
+            const addressComponents = place.address_components;
+            if (addressComponents) {
+              for (let component of addressComponents) {
+                const types = component.types;
+                if (types.includes('locality')) {
+                  setCiudad(component.long_name); // Actualizar la ciudad
+                  break;
+                }
+              }
+            }
+
             // Centra y hace zoom en la ubicación seleccionada
             map.setCenter(place.geometry.location);
             map.setZoom(13);
@@ -114,10 +129,9 @@ const AgregarParqueadero: React.FC = () => {
     (window as any).initMap = initMap;
 
     // Cargar el script y luego inicializar el mapa
-    loadMapScript().catch(error => {
+    loadMapScript().catch((error) => {
       console.error(error);
     });
-
   }, []);
 
   return (
@@ -133,18 +147,28 @@ const AgregarParqueadero: React.FC = () => {
             Agrega tu parqueadero y hazlo visible para miles de usuarios en nuestra plataforma.
           </p>
           {error && <p className="text-red-500 text-center mb-1">{error}</p>}
-          <form onSubmit={handleSubmit}> 
+          <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div className="col-span-2">
                 <label className="block text-gray-300">Dirección</label>
                 <input
                   type="text"
                   id="Direccion"
-                  name="Direccion"
-                  value={Direccion}
-                  onChange={(e) => setDireccion(e.target.value)}
+                  ref={direccionInputRef} // Usar la referencia para el autocompletado
                   className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none"
                   placeholder="Dirección"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-300">Ciudad</label>
+                <input
+                  type="text"
+                  id="Ciudad"
+                  name="Ciudad"
+                  value={Ciudad}
+                  onChange={(e) => setCiudad(e.target.value)}
+                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none"
+                  placeholder="Ciudad"
                 />
               </div>
               <div>
@@ -183,18 +207,6 @@ const AgregarParqueadero: React.FC = () => {
                   placeholder="Correo Electrónico"
                 />
               </div>
-              <div>
-                <label className="block text-gray-300">Precio por Hora</label>
-                <input
-                  type="number"
-                  id="Precio"
-                  name="Precio"
-                  value={Precio}
-                  onChange={(e) => setPrecio(e.target.value)}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none"
-                  placeholder="Precio por Hora"
-                />
-              </div>
             </div>
             <div className="mb-6">
               <input type="checkbox" id="terms" className="mr-2" />
@@ -207,18 +219,13 @@ const AgregarParqueadero: React.FC = () => {
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded"
               disabled={loading}
             >
-            {loading ? "Registrando..." : "Registrar Parqueadero"}
-              
+              {loading ? 'Registrando...' : 'Registrar Parqueadero'}
             </button>
           </form>
         </div>
         {/* Sección derecha con el mapa */}
         <div className="w-1/3">
-          <div
-            id="map"
-            
-            className="w-full h-full bg-gray-600 rounded-lg"
-          ></div>
+          <div id="map" className="w-full h-full bg-gray-600 rounded-lg"></div>
         </div>
       </div>
     </div>

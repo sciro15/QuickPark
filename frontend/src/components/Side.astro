@@ -1,10 +1,11 @@
 ---
 export interface Props {
   isAdmin: boolean;
+  auth: boolean;
 }
 
-// Recibe la propiedad isAdmin de las props
 const { isAdmin } = Astro.props;
+const { auth } = Astro.props;
 
 const userLinks = [
   { href: '/', icon: 'fa-home', text: 'Inicio' },
@@ -19,110 +20,152 @@ const adminLinks = [
 ];
 ---
 
-<aside class="Sidebar fixed bottom-8 left-4 z-50 flex flex-col bg-gray-800 rounded-t-lg shadow-lg transition-transform transform translate-y-full">
-  <!-- Rayita para desplegar el sidebar -->
-  <div class="handle cursor-pointer text-white rounded-full absolute top-2 left-1/2 transform -translate-x-1/2 z-60">
-    <div class="w-10 h-1 bg-white"></div>
-  </div>
-  
-  <!-- Contenido del sidebar -->
-  <div id="sidebarContent" class="w-96 flex flex-col bg-gray-800 rounded-t-lg shadow-lg p-6 pt-16 relative overflow-y-auto max-h-[50vh]">
-    <!-- Campo de búsqueda -->
-    <div class="absolute top-4 left-1/2 transform -translate-x-1/2 w-full px-4">
-      <input type="text" placeholder="Buscar" class="w-full px-6 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sidebar</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+  <aside class="Sidebar fixed bottom-8 left-4 z-50 flex flex-col bg-gray-800 rounded-t-lg shadow-lg transition-transform transform translate-y-full">
+    <!-- Rayita para desplegar el sidebar -->
+    <div class="handle cursor-pointer text-white rounded-full absolute top-2 left-1/2 transform -translate-x-1/2 z-60">
+      <div class="w-10 h-1 bg-white"></div>
     </div>
     
-    <!-- Botones de Registro e Inicio de Sesión -->
-    <div class="flex flex-row justify-center mt-1 mb-4 space-x-4 relative z-10">
-      <button class="text-md text-white hover:text-gray-300 transition-colors bg-blue-500 px-6 py-2 rounded-lg">
-        Registro
+    <!-- Contenido del sidebar -->
+    <div id="sidebarContent" class="w-96 flex flex-col bg-gray-800 rounded-t-lg shadow-lg p-6 pt-16 relative overflow-y-auto max-h-[50vh]">
+      <!-- Campo de búsqueda -->
+      <div class="absolute top-4 left-1/2 transform -translate-x-1/2 w-full px-4">
+        <input type="text" placeholder="Buscar" class="w-full px-6 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
+      {!auth ? (
+      <!-- Botones de Registro e Inicio de Sesión -->
+      <div class="flex flex-row justify-center mt-1 mb-4 space-x-4 relative z-10">
+        <a href="/registro" class="text-md text-white hover:text-gray-300 transition-colors bg-blue-500 px-6 py-2 rounded-lg">
+          Registro
+        </a>
+        <a href="/login" class="text-md text-white hover:text-gray-300 transition-colors bg-green-500 px-6 py-2 rounded-lg">
+          Inicio de Sesión
+        </a>
+      </div>
+      ) : (
+      <!-- Botón de Salir -->
+      <button id="logoutButton" class="text-md text-white hover:text-gray-300 transition-colors bg-green-500 px-6 py-2 rounded-lg">
+        Salir
       </button>
-      <button class="text-md text-white hover:text-gray-300 transition-colors bg-green-500 px-6 py-2 rounded-lg">
-        Inicio de Sesión
-      </button>
+      )}
+      
+      <!-- Enlaces -->
+      <nav class="flex flex-col items-start px-4 pt-12">
+        <ul class="space-y-4">
+          {isAdmin ? (
+            adminLinks.map(link => (
+              <li class="flex items-center">
+                <a href={link.href} class="flex items-center text-lg text-white hover:text-gray-300 transition-colors">
+                  <i class={`fas ${link.icon} mr-2`}></i>
+                  {link.text}
+                </a>
+              </li>
+            ))
+          ) : (
+            userLinks.map(link => (
+              <li class="flex items-center">
+                <a href={link.href} class="flex items-center text-lg text-white hover:text-gray-300 transition-colors">
+                  <i class={`fas ${link.icon} mr-2`}></i>
+                  {link.text}
+                </a>
+              </li>
+            ))
+          )}
+        </ul>
+      </nav>
     </div>
+  </aside>
 
-    <!-- Enlaces -->
-    <nav class="flex flex-col items-start px-4 pt-12">
-      <ul class="space-y-4">
-        {isAdmin ? (
-          adminLinks.map(link => (
-            <li class="flex items-center">
-              <a href={link.href} class="flex items-center text-lg text-white hover:text-gray-300 transition-colors">
-                <i class={`fas ${link.icon} mr-2`}></i>
-                {link.text}
-              </a>
-            </li>
-          ))
-        ) : (
-          userLinks.map(link => (
-            <li class="flex items-center">
-              <a href={link.href} class="flex items-center text-lg text-white hover:text-gray-300 transition-colors">
-                <i class={`fas ${link.icon} mr-2`}></i>
-                {link.text}
-              </a>
-            </li>
-          ))
-        )}
-      </ul>
-    </nav>
-  </div>
-</aside>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const handle = document.querySelector('.handle');
+      const sidebar = document.querySelector('.Sidebar');
+      const logoutButton = document.getElementById('logoutButton');
 
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const handle = document.querySelector('.handle');
-    const sidebar = document.querySelector('.Sidebar');
+      if (handle && sidebar) {
+        handle.addEventListener('click', () => {
+          sidebar.classList.toggle('translate-y-full');
+          sidebar.classList.toggle('translate-y-0');
+        });
+      }
 
-    if (handle && sidebar) {
-      handle.addEventListener('click', () => {
-        sidebar.classList.toggle('translate-y-full');
-        sidebar.classList.toggle('translate-y-0');
-      });
+      if (logoutButton) {
+        logoutButton.addEventListener('click', async (event) => {
+          event.preventDefault();
+          try {
+            const response = await fetch('http://localhost:2402/api/login/logout', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            });
+
+            if (response.ok) {
+              window.location.href = '/login';
+            } else {
+              console.error('Error al cerrar sesión:', await response.json());
+              alert('No se pudo cerrar la sesión. Inténtalo de nuevo.');
+            }
+          } catch (error) {
+            console.error('Error al cerrar sesión:', error);
+            alert('Error inesperado. Inténtalo de nuevo.');
+          }
+        });
+      }
+    });
+  </script>
+
+  <style>
+    .Sidebar {
+      background-color: #1c2222;
+      border-radius: 0.5rem 0.5rem 0 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      padding: 1rem;
+      transition: transform 0.3s ease-in-out;
+      width: 27rem; /* Ancho del sidebar */
+      bottom: 130px; /* Ajusta la posición desde el borde inferior para que quede más arriba */
     }
-  });
-</script>
 
-<style>
-  .Sidebar {
-    background-color: #1c2222;
-    border-radius: 0.5rem 0.5rem 0 0;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-    padding: 1rem;
-    transition: transform 0.3s ease-in-out;
-    width: 27rem; /* Ancho del sidebar */
-    bottom: 130px; /* Ajusta la posición desde el borde inferior para que quede más arriba */
-  }
+    #sidebarContent {
+      width: 100%; /* Asegura que el contenido del sidebar tenga el mismo ancho */
+    }
 
-  #sidebarContent {
-    width: 100%; /* Asegura que el contenido del sidebar tenga el mismo ancho */
-  }
+    .translate-y-full {
+      transform: translateY(100%);
+    }
 
-  .translate-y-full {
-    transform: translateY(100%);
-  }
+    .translate-y-0 {
+      transform: translateY(0);
+    }
 
-  .translate-y-0 {
-    transform: translateY(0);
-  }
+    .handle {
+      top: 1rem; /* Ajusta la posición de la rayita más cerca del borde superior del sidebar */
+      z-index: 60; /* Asegura que la rayita esté sobre el contenido del sidebar */
+    }
 
-  .handle {
-    top: 1rem; /* Ajusta la posición de la rayita más cerca del borde superior del sidebar */
-    z-index: 60; /* Asegura que la rayita esté sobre el contenido del sidebar */
-  }
+    /* Estilos para la barra de desplazamiento */
+    #sidebarContent::-webkit-scrollbar {
+      width: 8px; /* Ancho de la barra de desplazamiento */
+    }
 
-  /* Estilos para la barra de desplazamiento */
-  #sidebarContent::-webkit-scrollbar {
-    width: 8px; /* Ancho de la barra de desplazamiento */
-  }
+    #sidebarContent::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.3); /* Color del "dedo" de la barra de desplazamiento */
+      border-radius: 10px; /* Bordes redondeados del "dedo" */
+    }
 
-  #sidebarContent::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.3); /* Color del "dedo" de la barra de desplazamiento */
-    border-radius: 10px; /* Bordes redondeados del "dedo" */
-  }
-
-  #sidebarContent::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1); /* Color del fondo de la barra de desplazamiento */
-    border-radius: 10px; /* Bordes redondeados del track */
-  }
-</style>
+    #sidebarContent::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1); /* Color del fondo de la barra de desplazamiento */
+      border-radius: 10px; /* Bordes redondeados del track */
+    }
+  </style>
+</body>
+</html>

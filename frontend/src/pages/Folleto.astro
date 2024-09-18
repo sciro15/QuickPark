@@ -1,93 +1,98 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import '../styles/global.css';
 ---
-<div class="bg-gradient-to-r from-gray-100 to-green-100 min-h-screen flex flex-col items-center justify-center">
-    <header class="w-full max-w-5xl flex justify-between p-4 bg-white shadow-md rounded-lg">
-      <div class="text-lg font-bold">Regresar</div>
-      <nav class="space-x-4">
-        <a href="#" class="text-gray-700 hover:text-blue-500">NAVEGAR</a>
-        <a href="#" class="text-gray-700 hover:text-blue-500">CONTACTO</a>
-      </nav>
-    </header>
-  
-    <div class="bg-white max-w-5xl mt-6 rounded-lg shadow-lg p-8">
-      <div class="md:flex">
-        <div class="md:w-2/3">
-          <h1 class="text-3xl font-bold mb-4">Parqueadero El Descanso</h1>
-          <p class="text-sm text-gray-600 mb-4">
-            Parqueadero El Descanso te brinda espacios para estacionar de manera segura y conveniente. Ubicado en una zona estrategica de la ciudad, ofrecemos servicio de vigilancia 24/7 y amplios espacios con tarifas accesibles.
-          </p>
-        </div>
-        <div class="md:w-1/3 bg-black" >
-            <img src="" class="rounded-lg shadow-md">
-        </div>
-      </div>
-  
-
-      <div class="bg-[#0ACF9B] text-white rounded-lg p-6 mt-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-          <div>
-            <h2 class="text-xl font-bold mb-2">TARIFAS</h2>
-            <p>Hora: $8.000 COP</p>
-            <p>Dia completo: $20.000 COP</p>
-            <p>Mensualidad: $250.000 COP</p>
-            <p>Consulta nuestras promociones y descuentos especiales en nuestra pagina web o en nuestros oficiales.</p>
+<Layout title="Welcome to Astro.">
+  <main class="flex">
+    <div class="bg-gradient-to-r from-gray-100 to-green-100 min-h-screen flex flex-col items-center justify-center">
+      <header class="w-full max-w-5xl flex justify-between p-4 bg-white shadow-md rounded-lg">
+        <div class="text-lg font-bold">Regresar</div>
+        <nav class="space-x-4">
+          <a href="#" class="text-gray-700 hover:text-blue-500">NAVEGAR</a>
+          <a href="#" class="text-gray-700 hover:text-blue-500">CONTACTO</a>
+        </nav>
+      </header>
+    
+      <div class="bg-white max-w-5xl mt-6 rounded-lg shadow-lg p-8">
+        <div class="md:flex">
+          <div class="md:w-2/3">
+            <h1 class="text-3xl font-bold mb-4">Parqueadero El Descanso</h1>
+            <p class="text-sm text-gray-600 mb-4">
+              Parqueadero El Descanso te brinda espacios para estacionar de manera segura y conveniente. Ubicado en una zona estrategica de la ciudad, ofrecemos servicio de vigilancia 24/7 y amplios espacios con tarifas accesibles.
+            </p>
           </div>
-  
-
-          <div>
-            <h2 class="text-xl font-bold mb-2">Caracteristicas</h2>
-            <ul class="list-disc ml-4">
-              <li>Vigilancia 24/7</li>
-              <li>Completo de vehiculos (lavado y servicio)</li>
-              <li>Zonas techadas y al aire libre</li>
-              <li>Acceso a internet WiFi gratuito</li>
-              <li>Estacionamiento para bicicletas y motocicletas</li>
-              <li>Estacionamiento para personas con movilidad reducida</li>
-            </ul>
+          <div class="md:w-1/3 bg-black" >
+              <img src="" class="rounded-lg shadow-md">
           </div>
-
-          <div>
-            <div class="w-full h-full bg-gray-400">
-                <img src="" class="rounded-lg shadow-md mt-4 md:mt-0">
+        </div>
+    
+  
+        <div class="bg-[#0ACF9B] text-white rounded-lg p-6 mt-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+  
+            <div>
+              <h2 class="text-xl font-bold mb-2">TARIFAS</h2>
+              <p>Hora: $8.000 COP</p>
+              <p>Dia completo: $20.000 COP</p>
+              <p>Mensualidad: $250.000 COP</p>
+              <p>Consulta nuestras promociones y descuentos especiales en nuestra pagina web o en nuestros oficiales.</p>
+            </div>
+    
+  
+            <div>
+              <h2 class="text-xl font-bold mb-2">Caracteristicas</h2>
+              <ul class="list-disc ml-4">
+                <li>Vigilancia 24/7</li>
+                <li>Completo de vehiculos (lavado y servicio)</li>
+                <li>Zonas techadas y al aire libre</li>
+                <li>Acceso a internet WiFi gratuito</li>
+                <li>Estacionamiento para bicicletas y motocicletas</li>
+                <li>Estacionamiento para personas con movilidad reducida</li>
+              </ul>
+            </div>
+  
+            <div>
+              <div class="w-full h-full bg-gray-400">
+                  <img src="" class="rounded-lg shadow-md mt-4 md:mt-0">
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <div class="mt-6">
+          <h2 class="text-xl font-bold mb-2">CONTACTANOS</h2>
+          <div class="md:flex">
+          
+            <div class="md:w-2/3">
+              <p>Direccion: Carrera 45 #32-67, Barrio El Poblado, Medellin, Colombia.</p>
+              <p>Telefono: +57 310 456 7890</p>
+              <p>Correo electronico: contacto@parqueaderoeldescanso.co</p>
+            </div>
+    
+            <div class="md:w-1/3">
+              <img src="./public/parqueaderos.jpg" class="rounded-lg shadow-md mt-4 md:mt-0">
             </div>
           </div>
         </div>
       </div>
-
-      <div class="mt-6">
-        <h2 class="text-xl font-bold mb-2">CONTACTANOS</h2>
-        <div class="md:flex">
-        
-          <div class="md:w-2/3">
-            <p>Direccion: Carrera 45 #32-67, Barrio El Poblado, Medellin, Colombia.</p>
-            <p>Telefono: +57 310 456 7890</p>
-            <p>Correo electronico: contacto@parqueaderoeldescanso.co</p>
-          </div>
   
-          <div class="md:w-1/3">
-            <img src="./public/parqueaderos.jpg" class="rounded-lg shadow-md mt-4 md:mt-0">
-          </div>
+    <div>
+  
+      <footer class="mt-6 p-4 text-center">
+        <div class="flex justify-center space-x-4 mt-2">
+          <a href="https://facebook.com" class="text-gray-700 hover:text-blue-500">
+            <i class="fab fa-facebook-f text-2xl"></i>
+          </a>
+          <a href="https://twitter.com" class="text-gray-700 hover:text-blue-500">
+            <i class="fab fa-twitter text-2xl"></i>
+          </a>
+          <a href="https://instagram.com" class="text-gray-700 hover:text-blue-500">
+            <i class="fab fa-instagram text-2xl"></i>
+          </a>
         </div>
-      </div>
+        <p class="text-sm text-gray-600">Copyright © 2024. All rights reserved.</p>
+      </footer>
     </div>
-
-  <div>
-
-    <footer class="mt-6 p-4 text-center">
-      <div class="flex justify-center space-x-4 mt-2">
-        <a href="https://facebook.com" class="text-gray-700 hover:text-blue-500">
-          <i class="fab fa-facebook-f text-2xl"></i>
-        </a>
-        <a href="https://twitter.com" class="text-gray-700 hover:text-blue-500">
-          <i class="fab fa-twitter text-2xl"></i>
-        </a>
-        <a href="https://instagram.com" class="text-gray-700 hover:text-blue-500">
-          <i class="fab fa-instagram text-2xl"></i>
-        </a>
-      </div>
-      <p class="text-sm text-gray-600">Copyright © 2024. All rights reserved.</p>
-    </footer>
-  </div>
-  </div>
+    </div>
+  </main>
+</Layout>
