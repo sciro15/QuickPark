@@ -1,8 +1,8 @@
 ---
+// Definición de la interfaz de los marcadores
 export interface Marker {
-  lat: number;
-  lng: number;
-  info: string;
+  direccion: string;  // Cadena de texto de la dirección
+  info: string;       // Información que se muestra en el InfoWindow
 }
 
 // Este componente ahora recibe los marcadores desde el frontmatter de Astro
@@ -14,15 +14,82 @@ const markers: Marker[] = Astro.props.markers;
 
 <!-- Cargar el script y inicializar el mapa -->
 <script type="text/javascript">
+  window.initMap = function() {
+    const mapElement = document.getElementById('map');
+    if (mapElement && window.google) {
+      const centroMapa = { lat: 6.2667791, lng: -75.750597 };
+      const map = new google.maps.Map(mapElement, {
+        zoom: 8,
+        center: centroMapa,
+      });
+
+      // Servicio de geocodificación
+      const geocoder = new google.maps.Geocoder();
+
+      // Obtén los marcadores desde el data attribute
+      const markers = JSON.parse(mapElement.getAttribute('data-markers') || '[]');
+      console.log('Markers Data:', markers);
+
+      markers.forEach(({ direccion, info }) => {
+        if (direccion) {
+          // Convierte la dirección a lat/lng y añade el marcador
+          geocodeAddress(direccion, info);
+        } else {
+          console.error('No se proporcionó una dirección válida.');
+        }
+      });
+
+      // Función para añadir un marcador al mapa
+      function addMarker({ lat, lng, info }) {
+        const marker = new google.maps.Marker({
+          position: { lat, lng },
+          map,
+          title: info
+        });
+
+        // Configura el InfoWindow
+        const infoWindow = new google.maps.InfoWindow({
+          content: info,
+        });
+
+        marker.addListener('click', () => {
+          infoWindow.open(map, marker);
+        });
+
+        // Centrar el mapa en el nuevo marcador
+        map.setCenter({ lat, lng });
+        map.setZoom(14);
+      }
+
+      // Función para geocodificar la dirección y agregar el marcador
+      function geocodeAddress(address, info) {
+        geocoder.geocode({ address }, (results, status) => {
+          if (status === 'OK' && results[0]) {
+            const location = results[0].geometry.location;
+            addMarker({
+              lat: location.lat(),
+              lng: location.lng(),
+              info: info || address
+            });
+          } else {
+            console.error(`Geocoding failed for address: ${address}, status: ${status}`);
+          }
+        });
+      }
+    } else {
+      console.error('Google Maps API not loaded or map element not found.');
+    }
+  };
+
   const loadMapScript = () => {
     return new Promise((resolve, reject) => {
       if (window.google) {
-        resolve(); // El script ya está cargado
+        resolve();
         return;
       }
 
       const script = document.createElement('script');
-      script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCUh1x87CO7CnavPoYg8Onq0IEH1ck-3hM&callback=initMap';
+      script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCUh1x87CO7CnavPoYg8Onq0IEH1ck-3hM&libraries=places';
       script.async = true;
       script.defer = true;
       script.onload = () => resolve();
@@ -31,41 +98,10 @@ const markers: Marker[] = Astro.props.markers;
     });
   };
 
-  const initMap = (markers) => {
-    const mapElement = document.getElementById('map');
-    if (mapElement && window.google) {
-      const centroMapa = { lat: -34.397, lng: 150.644 };
-      const map = new google.maps.Map(mapElement, {
-        zoom: 8,
-        center: centroMapa,
-      });
-
-      markers.forEach(({ lat, lng, info }) => {
-        const marker = new google.maps.Marker({
-          position: { lat, lng },
-          map,
-        });
-
-        const infoWindow = new google.maps.InfoWindow({
-          content: tittlerinfo,
-        });
-
-        marker.addListener('click', () => {
-          infoWindow.open(map, marker);
-        });
-      });
-    }
-  };
-
   document.addEventListener("DOMContentLoaded", () => {
-    loadMapScript()
-      .then(() => {
-        const markers = JSON.parse(document.getElementById('map').getAttribute('data-markers'));
-        initMap(markers);
-      })
-      .catch(error => {
-        console.error(error);
-      });
+    loadMapScript().catch(error => {
+      console.error(error);
+    });
   });
 </script>
 
