@@ -40,13 +40,13 @@ class Parqueadero {
     }
 
     // Actualizar un parqueadero
-    async updateParqueadero(id, Nombre, Texto, AdministradorID, Direccion, Telefono, Correo, Precio) {
+    async updateParqueadero(id, Nombre, Descripcion, AdministradorID, Direccion, Telefono, Correo, Precio) {
         const query = `
             UPDATE Parqueadero 
             SET Nombre = ?, Texto = ?, AdministradorID = ?, Direccion = ?, Telefono = ?, Correo = ?, Precio = ? 
             WHERE id = ?`;
         try {
-            const [result] = await this.database.query(query, [Nombre, Texto, AdministradorID, Direccion, Telefono, Correo, Precio, id]);
+            const [result] = await this.database.query(query, [Nombre, Descripcion, AdministradorID, Direccion, Telefono, Correo, Precio, id]);
             return result;
         } catch (err) {
             console.error('Error en updateParqueadero:', err);
@@ -55,12 +55,12 @@ class Parqueadero {
     }
 
     // Agregar un nuevo parqueadero
-    async addParqueadero(Nombre, Texto, AdministradorID, Direccion, Telefono, Correo, Precio) {
+    async addParqueadero(Nombre, Descripcion, AdministradorID, Direccion, Telefono, Correo, Precio) {
         const query = `
-            INSERT INTO Parqueadero (Nombre, Texto, AdministradorID, Direccion, Telefono, Correo, Precio) 
+            INSERT INTO Parqueadero (Nombre, Descripcion, AdministradorID, Direccion, Telefono, Correo, Precio) 
             VALUES (?, ?, ?, ?, ?, ?, ?)`;
         try {
-            const [result] = await this.database.query(query, [Nombre, Texto, AdministradorID, Direccion, Telefono, Correo, Precio]);
+            const [result] = await this.database.query(query, [Nombre, Descripcion, AdministradorID, Direccion, Telefono, Correo, Precio]);
             return result;
         } catch (err) {
             console.error('Error en addParqueadero:', err);
