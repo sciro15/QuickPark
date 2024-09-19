@@ -12,7 +12,10 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:4321', // Cambia esto por el origen de tu frontend
+  credentials: true, // Permite el uso de cookies y otros encabezados de credenciales
+}));
 app.use(helmet());
 app.use(express.json());
 

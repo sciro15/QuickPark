@@ -5,63 +5,75 @@ import jwt from 'jsonwebtoken';
 
 dotenv.config();
 
-// Verifica el contenido de la contraseña y el hash
+// Comparar contraseñas con bcrypt
 const comparePasswords = async (plainTextPassword, hashedPassword) => {
-  console.log('Contraseña en texto plano:', plainTextPassword);
-  console.log('Contraseña hasheada:', hashedPassword);
-
-  try {
-    // bcrypt.compare compara directamente la contraseña ingresada con la almacenada
-    if (!plainTextPassword || !hashedPassword) {
-      throw new Error('Contraseña en texto plano o hash de contraseña no proporcionados');
-    }
-    const isMatch = await bcrypt.compare(plainTextPassword, hashedPassword);
-    console.log('Resultado de la comparación:', isMatch); // Log para verificar el resultado
-    return isMatch;
-  } catch (error) {
-    console.error('Error al comparar contraseñas:', error);
-    throw error;
+  if (!plainTextPassword || !hashedPassword) {
+    throw new Error('Contraseña en texto plano o hash de contraseña no proporcionados');
   }
+  return await bcrypt.compare(plainTextPassword, hashedPassword);
 };
 
+// Generar el token JWT
+const generateToken = (userId, userType) => {
+  return jwt.sign(
+    { id: userId, tipoUsuario: userType },
+    process.env.SECRET_KEY,
+    { expiresIn: '1h' }
+  );
+};
+
+// Autenticar usuario y guardar el token en la cookie
 const authenticateUser = async (req, res) => {
-  console.log('Datos de la solicitud:', req.body);
-  
   const { Usuario, Contraseña } = req.body;
-  console.log(Usuario, Contraseña); //
+
+  if (!Usuario || !Contraseña) {
+    return res.status(400).json({ message: 'Usuario y contraseña son requeridos' });
+  }
+
   try {
-    // Buscar en la tabla de Administrador
-    const [admin] = await db.query('SELECT * FROM Administrador WHERE Usuario = ?', [Usuario]);
+    // Función para buscar el usuario en las tablas Administrador y Persona
+    const findUser = async (table) => {
+      const [result] = await db.query(`SELECT * FROM ${table} WHERE Usuario = ?`, [Usuario]);
+      return result.length > 0 ? result[0] : null;
+    };
 
-    if (admin && admin.length > 0) {
-      const adminRecord = admin[0];
-      console.log('Registro de administrador:', adminRecord); // Verifica el contenido del registro
-      const isPasswordValid = await comparePasswords(Contraseña, adminRecord.Contraseña);
-
+    // Intentar encontrar al usuario en la tabla de Administradores
+    let user = await findUser('Administrador');
+    if (user) {
+      const isPasswordValid = await comparePasswords(Contraseña, user.Contraseña);
       if (isPasswordValid) {
-        const token = jwt.sign({ id: adminRecord.id, tipoUsuario: 'Administrador' }, process.env.SECRET_KEY, { expiresIn: '1h' });
-        req.session.token = token; // Guardar el token en la sesión
-
-        return res.json({ message: 'Autenticado correctamente' });
+        const token = generateToken(user.id, 'Administrador');
+        
+        // Guardar el token en una cookie HTTP-Only
+        res.cookie('jwt_token', token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production', // Solo usar cookies seguras en producción
+          maxAge: 3600000 // 1 hora
+        });
+        
+        return res.json({ token, message: 'Autenticado correctamente como Administrador' });
       }
     }
 
-    // Buscar en la tabla de Persona
-    const [persona] = await db.query('SELECT * FROM Persona WHERE Usuario = ?', [Usuario]);
-
-    if (persona && persona.length > 0) {
-      const personaRecord = persona[0];
-      console.log('Registro de persona:', personaRecord); // Verifica el contenido del registro
-      const isPasswordValid = await comparePasswords(Contraseña, personaRecord.Contraseña);
-
+    // Intentar encontrar al usuario en la tabla de Personas
+    user = await findUser('Persona');
+    if (user) {
+      const isPasswordValid = await comparePasswords(Contraseña, user.Contraseña);
       if (isPasswordValid) {
-        const token = jwt.sign({ id: personaRecord.id, tipoUsuario: 'Persona' }, process.env.SECRET_KEY, { expiresIn: '1h' });
-        req.session.token = token;
-        return res.json({ message: 'Autenticado correctamente' });
+        const token = generateToken(user.id, 'Persona');
+        
+        // Guardar el token en una cookie HTTP-Only
+        res.cookie('jwt_token', token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production', // Solo usar cookies seguras en producción
+          maxAge: 3600000 // 1 hora
+        });
+        
+        return res.json({ token, message: 'Autenticado correctamente como Persona' });
       }
     }
 
-    // Si no coincide ningún usuario o contraseña
+    // Si ningún usuario coincide o la contraseña no es válida
     return res.status(401).json({ message: 'Usuario o contraseña incorrectos' });
   } catch (error) {
     console.error('Error al autenticar:', error);
@@ -69,4 +81,23 @@ const authenticateUser = async (req, res) => {
   }
 };
 
-export default authenticateUser;
+// Obtener los datos de la sesión a partir del token en la cookie
+const getSessionData = (req, res) => {
+  // Verifica si el usuario ha sido autenticado y el token fue verificado en el middleware
+  if (!req.user) {
+    return res.status(401).json({ message: 'No se encontró un usuario autenticado' });
+  }
+
+  // Extrae los datos del usuario del token JWT decodificado
+  const { id, tipoUsuario } = req.user;
+
+  // Enviar los datos de sesión al cliente
+  return res.json({
+    isAuthenticated: true,  // Indica que el usuario está autenticado
+    tipoUsuario,            // El tipo de usuario (ej. 'Administrador', 'Persona')
+    verificado: true,       // El token ha sido verificado correctamente
+    id                      // ID del usuario autenticado
+  });
+};
+
+export { authenticateUser, getSessionData };

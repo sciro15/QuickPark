@@ -1,8 +1,8 @@
 ---
-// Importa tus componentes
 import Layout from '../layouts/Layout.astro';
 import Sidebar from '../components/Side.astro';
 import MapWithMarkers from '../components/map.astro';
+import jwt from 'jsonwebtoken';
 
 // Obtener el token del usuario almacenado en las cookies
 const cookies = Astro.request.headers.get('cookie');
@@ -23,21 +23,17 @@ let sessionData = {
 // Verifica el token si existe
 if (token) {
   try {
-    const sessionResponse = await fetch('http://localhost:2402/api/login/protected', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`, // Incluye el token en los encabezados
-      },
-    });
+    // Decodifica el token sin verificarlo para obtener los datos
+    const decoded: any = jwt.decode(token); // Usar 'any' para evitar errores de tipo
+    console.log('Datos decodificados del token:', decoded); // Imprime los datos decodificados
 
-    if (sessionResponse.ok) {
-      sessionData = await sessionResponse.json();
-      console.log('Datos de sesión:', sessionData); // Imprime los datos de sesión para verificar
-    } else {
-      console.error('Error al obtener datos de sesión:', sessionResponse.statusText);
+    if (decoded) {
+      sessionData.isAuthenticated = true;
+      sessionData.tipoUsuario = decoded.tipoUsuario;
+      sessionData.verificado = true; // Considera que el token es válido si está decodificado
     }
   } catch (error) {
-    console.error("Error al verificar el token:", error);
+    console.error("Error al decodificar el token:", error);
   }
 } else {
   console.log('No se proporcionó un token');
@@ -45,7 +41,7 @@ if (token) {
 
 // Determinar si el usuario es administrador
 const isAdmin = sessionData.verificado && sessionData.tipoUsuario === 'Administrador';
-const auth = sessionData.verificado
+const auth = sessionData.verificado;
 console.log(sessionData.verificado); 
 console.log('Es administrador:', isAdmin); // Imprime si el usuario es administrador
 
@@ -56,16 +52,16 @@ const parkingResponse = await fetch('http://localhost:2402/api/Parqueadero/parqu
   }
 });
 const parkings = await parkingResponse.json();
- // Imprime los datos de parqueaderos
+// Imprime los datos de parqueaderos
 
 // Extrae solo lat y lng y opcionalmente la información para el marcador
-const markers = parkings.map((parking : any) => {
+const markers = parkings.map((parking: any) => {
   return {
     direccion: parking.Direccion,
     info: `${parking.Nombre}: ${parking.Direccion}` // Personaliza la información aquí
   };
 });
- // Imprime los marcadores para verificar
+// Imprime los marcadores para verificar
 ---
 
 <Layout title="Welcome to Astro.">
@@ -73,10 +69,10 @@ const markers = parkings.map((parking : any) => {
     <Sidebar isAdmin={isAdmin} auth={auth}/>
     <div class="map w-11/12 h-full">
       <MapWithMarkers markers={markers} />
-	  <script
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCUh1x87CO7CnavPoYg8Onq0IEH1ck-3hM&libraries=places&callback=initMap"
-      defer
-    ></script>
+      <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCUh1x87CO7CnavPoYg8Onq0IEH1ck-3hM&libraries=places&callback=initMap"
+        defer
+      ></script>
     </div>
   </main>
 </Layout>

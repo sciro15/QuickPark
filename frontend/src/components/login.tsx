@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 
+
 config.autoAddCss = false;
 
 const Ingreso = () => {
@@ -28,9 +29,9 @@ const Ingreso = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ Usuario: usuario, Contraseña: contrasena }),
-        credentials: "include", // Para enviar cookies de sesión si las hay
+        credentials : "include"
       });
-
+      console.log("Response:", response);
       if (response.ok) {
         const data = await response.json();
 
