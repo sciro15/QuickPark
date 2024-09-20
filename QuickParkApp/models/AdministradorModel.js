@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import bcrypt from 'bcrypt';
 class Administrador {
     constructor(database) {
         this.database = database;

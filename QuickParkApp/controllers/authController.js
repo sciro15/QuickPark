@@ -98,6 +98,19 @@ const getSessionData = (req, res) => {
     verificado: true,       // El token ha sido verificado correctamente
     id                      // ID del usuario autenticado
   });
+
 };
 
-export { authenticateUser, getSessionData };
+const logoutUser = (req, res) => {
+  // Eliminar la cookie jwt_token
+  res.clearCookie('jwt_token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', // Asegúrate de que sea segura en producción
+    path: '/', // Asegúrate de que el path sea correcto
+  });
+
+  // Devolver una respuesta al cliente
+  return res.json({ message: 'Sesión cerrada correctamente' });
+};
+
+export { authenticateUser, getSessionData, logoutUser };

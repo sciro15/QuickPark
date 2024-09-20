@@ -39,10 +39,7 @@ class Parqueadero {
         }
     }
 
-    // Actualizar un parqueadero
-    // En tu archivo del modelo
-
-  
+    // Agregar un nuevo parqueadero
     async addParqueadero(
         Nombre,
         Direccion,
@@ -64,7 +61,7 @@ class Parqueadero {
             (Nombre, Direccion, Telefono, Correo, lat, lng, AdministradorID, TarifaHora, TarifaDia, TarifaMensual, Descripcion, Servicios, Caracteristicas, ImagenPortada)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
-    
+
         // Asegúrate de que todos los valores no sean undefined, reemplazando undefined por null
         const values = [
             Nombre || null,
@@ -82,7 +79,7 @@ class Parqueadero {
             Caracteristicas ? JSON.stringify(Caracteristicas) : null, // JSON string of characteristics
             ImagenPortada || null // ImagenPortada se permite null si es opcional
         ];
-    
+
         try {
             const [result] = await this.database.execute(query, values); // Asegúrate de que this.database se está utilizando correctamente
             return result;  // Aquí debería tener `insertId`
@@ -91,10 +88,8 @@ class Parqueadero {
             throw error;
         }
     }
-    
-  
-  
 
+    // Actualizar un parqueadero
     async updateParqueadero(
         id,
         Nombre,
@@ -113,7 +108,7 @@ class Parqueadero {
         ImagenPortada
     ) {
         const query = `
-            UPDATE parqueaderos
+            UPDATE Parqueadero
             SET Nombre = ?, Direccion = ?, Telefono = ?, Correo = ?, lat = ?, lng = ?, AdministradorID = ?, TarifaHora = ?, TarifaDia = ?, TarifaMensual = ?, Descripcion = ?, Servicios = ?, Caracteristicas = ?, ImagenPortada = ?
             WHERE id = ?
         `;
@@ -130,16 +125,32 @@ class Parqueadero {
             TarifaDia,
             TarifaMensual,
             Descripcion,
-            Servicios,
-            Caracteristicas,
+            Servicios ? JSON.stringify(Servicios) : null,
+            Caracteristicas ? JSON.stringify(Caracteristicas) : null,
             ImagenPortada,
             id
         ];
 
-        return this.database.query(query, values);
+        try {
+            const [result] = await this.database.query(query, values);
+            return result;
+        } catch (error) {
+            console.error('Error en updateParqueadero:', error);
+            throw error;
+        }
     }
 
-    // Otros métodos como obtener, eliminar si es necesario
+    // Obtener parqueaderos por administrador
+    async getParqueaderosByAdministrador(id) {
+        const query = 'SELECT * FROM Parqueadero WHERE AdministradorID = ?';
+        try {
+            const [rows] = await this.database.query(query, [id]);
+            return rows;
+        } catch (err) {
+            console.error('Error en getParqueaderosByAdministrador:', err);
+            throw err;
+        }
+    }
 }
 
 export default Parqueadero;

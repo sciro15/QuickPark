@@ -1,5 +1,5 @@
 import express from 'express';
-import {authenticateUser, getSessionData } from '../controllers/authController.js';
+import {authenticateUser, getSessionData, logoutUser } from '../controllers/authController.js';
 import verifyToken from '../middleware/middleware.js';
 
 const router = express.Router();
@@ -9,6 +9,7 @@ router.post('/login', (req, res) => authenticateUser(req, res)); // Autenticaci√
 
 router.get('/protected', verifyToken, getSessionData);
 
+router.post('/logout', logoutUser);
 
 export default router;
  

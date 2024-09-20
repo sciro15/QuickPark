@@ -1,7 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Sidebar from '../components/Side.astro';
-import MapWithMarkers from '../components/map.astro';
 import jwt from 'jsonwebtoken';
 
 // Obtener el token del usuario almacenado en las cookies
@@ -23,7 +22,7 @@ let sessionData = {
 // Verifica el token si existe
 if (token) {
   try {
-    // Decodifica el token sin verificarlo para obtener los datos
+    // Decodifica el token para obtener los datos
     const decoded: any = jwt.decode(token); // Usar 'any' para evitar errores de tipo
     console.log('Datos decodificados del token:', decoded); // Imprime los datos decodificados
 
@@ -42,49 +41,48 @@ if (token) {
 // Determinar si el usuario es administrador
 const isAdmin = sessionData.verificado && sessionData.tipoUsuario === 'Administrador';
 const auth = sessionData.verificado;
-console.log(sessionData.verificado); 
+console.log('Datos de sessionData:', sessionData); // Imprime los datos de sessionData
 console.log('Es administrador:', isAdmin); // Imprime si el usuario es administrador
 
 // Fetch para obtener todos los datos de parqueaderos
 const parkingResponse = await fetch('http://localhost:2402/api/Parqueadero/parqueadero', {
   headers: {
     'Authorization': `Bearer ${token}`, // Incluye el token en los encabezados si es necesario
-  }
+  },
+  credentials: "include"
 });
+
+if (!parkingResponse.ok) {
+  console.error('Error al obtener los datos de parqueaderos:', parkingResponse.statusText);
+}
+
 const parkings = await parkingResponse.json();
-// Imprime los datos de parqueaderos
+console.log('Datos de parqueaderos recibidos:', parkings); // Imprime los datos recibidos de la API
 
 // Extrae solo lat y lng y opcionalmente la información para el marcador
 const markers = parkings.map((parking: any) => {
   return {
     direccion: parking.Direccion,
-    info: `${parking.Nombre}: ${parking.Direccion}` // Personaliza la información aquí
+    info: `${parking.Nombre}: ${parking.Direccion}, Precio por hora: ${parking.TarifaHora}`, // Personaliza la información aquí
+    id: parking.id // Incluye el ID en los datos del marcador
   };
 });
-// Imprime los marcadores para verificar
----
 
+console.log('Datos de los marcadores:', markers); // Imprime los datos de los marcadores
+
+// Obtener el ID del usuario del localStorage
+const userDataString = typeof window !== 'undefined' ? localStorage.getItem('userData') : null;
+const userData = userDataString ? JSON.parse(userDataString) : null;
+const userId = userData?.id || null;
+console.log('ID del usuario desde localStorage:', userId); // Imprime el ID del usuario
+
+---
 <Layout title="Welcome to Astro.">
   <main class="flex">
-    <Sidebar isAdmin={isAdmin} auth={auth}/>
-    <div class="map w-11/12 h-full">
-      <MapWithMarkers markers={markers} />
-      <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCUh1x87CO7CnavPoYg8Onq0IEH1ck-3hM&libraries=places&callback=initMap"
-        defer
-      ></script>
-    </div>
+    <Sidebar isAdmin={isAdmin} auth={auth} markers={markers} id={userId} client:load/>
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCUh1x87CO7CnavPoYg8Onq0IEH1ck-3hM&libraries=places&callback=initMap"
+      defer
+    ></script>
   </main>
 </Layout>
-
-<style>
-  .map {
-    flex-grow: 1; 
-    height: 100vh; 
-  }
-  
-  main {
-    justify-content: flex-start; 
-    align-items: flex-start;     
-  }
-</style>

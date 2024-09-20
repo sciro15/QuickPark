@@ -7,22 +7,42 @@ const AgregarTarifasServicios: React.FC = () => {
   const [Descripcion, setDescripcion] = useState("");
   const [Servicios, setServicios] = useState<string[]>([]);
   const [Caracteristicas, setCaracteristicas] = useState<string[]>([]);
+  const [AdministradorID, setAdministradorID] = useState<string | null>(null);
 
   // Servicios y características predefinidos
   const serviciosOpciones = ['Lavado de Autos', 'Vigilancia 24/7', 'Cargador Eléctrico', 'Valet Parking'];
   const caracteristicasOpciones = ['Techo Cubierto', 'Cámaras de Seguridad', 'Parqueo para Discapacitados', 'Espacios Amplios'];
 
   useEffect(() => {
+    // Obtener los datos del localStorage
     const storedData = localStorage.getItem('parqueaderoData');
     if (storedData) {
       const data = JSON.parse(storedData);
-      console.log('Datos almacenados en localStorage:', data); // Muestra los datos almacenados
+      console.log('Datos almacenados en localStorage:', data);
       setTarifaHora(data.TarifaHora || "");
       setTarifaDia(data.TarifaDia || "");
       setTarifaMensual(data.TarifaMensual || "");
       setDescripcion(data.Descripcion || "");
       setServicios(data.Servicios || []);
       setCaracteristicas(data.Caracteristicas || []);
+    }
+
+    // Obtener el ID del administrador del localStorage
+    const userData = localStorage.getItem('userData');
+    if (userData) {
+      try {
+        const parsedUserData = JSON.parse(userData);
+        console.log('Datos del usuario desde localStorage:', parsedUserData);
+        if (parsedUserData && parsedUserData.id) {
+          setAdministradorID(parsedUserData.id);
+        } else {
+          console.warn('El objeto userData no contiene el campo id');
+        }
+      } catch (error) {
+        console.error('Error al parsear userData desde localStorage:', error);
+      }
+    } else {
+      console.warn('No se encontró userData en localStorage');
     }
   }, []);
 
@@ -33,6 +53,7 @@ const AgregarTarifasServicios: React.FC = () => {
         ? prev.filter(item => item !== value)
         : [...prev, value]
     );
+    console.log('Servicios seleccionados:', Servicios);
   };
 
   const handleCaracteristicasChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,12 +63,12 @@ const AgregarTarifasServicios: React.FC = () => {
         ? prev.filter(item => item !== value)
         : [...prev, value]
     );
+    console.log('Características seleccionadas:', Caracteristicas);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Crear un objeto para almacenar los datos
     const parqueaderoData = {
       TarifaHora,
       TarifaDia,
@@ -55,30 +76,30 @@ const AgregarTarifasServicios: React.FC = () => {
       Descripcion,
       Servicios,
       Caracteristicas,
+      AdministradorID,
     };
 
-    // Obtener datos de la vista anterior desde localStorage
-    const vistaAnteriorData = JSON.parse(localStorage.getItem('parqueaderoData') || '{}');
+    console.log('Datos del formulario antes de enviar:', parqueaderoData);
 
-    // Combinamos los datos de ambas vistas
+    const vistaAnteriorData = JSON.parse(localStorage.getItem('parqueaderoData') || '{}');
+    console.log('Datos de la vista anterior:', vistaAnteriorData);
+
     const combinedData = {
       ...vistaAnteriorData,
       ...parqueaderoData,
     };
 
-    // Convertir los datos combinados a JSON y almacenarlos en localStorage
+    console.log('Datos combinados antes de guardar en localStorage:', combinedData);
+
     localStorage.setItem('parqueaderoData', JSON.stringify(combinedData));
 
-    console.log("Datos combinados antes de enviar:", combinedData); // Muestra los datos combinados
-
-    // Enviar los datos desglosados al servidor en formato JSON
     try {
       const response = await fetch('http://localhost:2402/api/Parqueadero/parqueadero', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(combinedData), // Convertir los datos a JSON
+        body: JSON.stringify(combinedData),
       });
 
       if (!response.ok) {
@@ -88,9 +109,14 @@ const AgregarTarifasServicios: React.FC = () => {
       }
 
       const result = await response.json();
-      console.log("Datos enviados:", combinedData); // Mostrar los datos enviados
+      console.log('Resultado de la respuesta del servidor:', result);
       alert('Datos guardados correctamente en el servidor');
-      console.log("Respuesta del servidor:", result);
+      
+      localStorage.removeItem('parqueaderoData');
+
+      const id = result.id;
+      console.log('ID recibido del servidor:', id);
+      window.location.href = `/Folleto?id=${id}`;
     } catch (error) {
       console.error('Error en la solicitud:', error);
       alert('Error al guardar los datos en el servidor');
@@ -206,11 +232,7 @@ const AgregarTarifasServicios: React.FC = () => {
               <p>{Caracteristicas.length > 0 && `Características seleccionadas: ${Caracteristicas.join(", ")}`}</p>
             </div>
           </div>
-          <div>
-            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded">
-              Guardar Parqueadero
-            </button>
-          </div>
+          <button type="submit" className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded">Guardar</button>
         </form>
       </div>
     </div>

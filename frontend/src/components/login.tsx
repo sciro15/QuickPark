@@ -1,15 +1,20 @@
 import React, { useState } from "react";
-import { config } from "@fortawesome/fontawesome-svg-core";
-import "@fortawesome/fontawesome-svg-core/styles.css";
-
-
-config.autoAddCss = false;
 
 const Ingreso = () => {
   const [usuario, setUsuario] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const decodeJwt = (token: string) => {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(window.atob(base64)
+      .split('')
+      .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+      .join(''));
+    return JSON.parse(jsonPayload);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,14 +34,17 @@ const Ingreso = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ Usuario: usuario, Contraseña: contrasena }),
-        credentials : "include"
+        credentials: "include", // Permitir que se envíen cookies con la solicitud
       });
-      console.log("Response:", response);
+
       if (response.ok) {
         const data = await response.json();
-
-        // Guardar el token JWT en localStorage o sessionStorage
+        // Guardar el token JWT en localStorage
         localStorage.setItem("token", data.token);
+
+        // Decodificar el token JWT y guardar los datos en localStorage
+        const decodedToken = decodeJwt(data.token);
+        localStorage.setItem("userData", JSON.stringify(decodedToken));
 
         // Redirigir al usuario después de un inicio de sesión exitoso
         window.location.replace("/");
@@ -58,9 +66,14 @@ const Ingreso = () => {
       style={{ backgroundImage: 'url("/images/fond.png")' }}
     >
       <div className="bg-gray-800 text-white bg-opacity-80 rounded-lg shadow-lg p-8 md:p-10 max-w-xs sm:max-w-md md:max-w-lg w-full">
-        <div className="text-center mb-6">
-          <img src="/images/Logo.png" alt="Logo QuickPark" className="mx-auto h-16" />
-          <h2 className="text-xl md:text-2xl font-bold mt-4">Inicio de Sesión</h2>
+        <div className="flex items-center mb-6">
+          <a href="/" className="text-white text-2xl mr-4">
+            &larr; {/* Flecha de retroceso como entidad HTML */}
+          </a>
+          <div className="text-center flex-1">
+            <img src="/images/Logo.png" alt="Logo QuickPark" className="mx-auto h-16" />
+            <h2 className="text-xl md:text-2xl font-bold mt-4">Inicio de Sesión</h2>
+          </div>
         </div>
 
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
@@ -121,4 +134,4 @@ const Ingreso = () => {
   );
 };
 
-export default Ingreso;
+export default Ingreso;

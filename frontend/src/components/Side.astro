@@ -2,205 +2,246 @@
 export interface Props {
   isAdmin: boolean;
   auth: boolean;
+  id?: string; // Opcional, ya que puede no estar disponible
+  markers: { direccion: string; info: string }[]; // Marcadores para el mapa
 }
 
-const { isAdmin } = Astro.props;
-const { auth } = Astro.props;
+const { isAdmin, auth, markers } = Astro.props;
 
+// Enlaces de usuario y administrador
 const userLinks = [
-  { href: '/', icon: 'fa-home', text: 'Inicio' },
-  { href: '/perfil', icon: 'fa-user', text: 'Perfil' },
-  { href: '/soporte', icon: 'fa-headset', text: 'Soporte' }
+  { href: '/Listado?id=${id}', icon: 'fa-solid fa-car-alt', text: 'Listado de Parqueaderos' },
+  { href: '/Politicas', icon: 'fa-solid fa-shield-alt', text: 'Políticas' }
 ];
 
 const adminLinks = [
-  { href: '/dashboard', icon: 'fa-tachometer-alt', text: 'Dashboard' },
-  { href: '/usuarios', icon: 'fa-users', text: 'Gestionar Usuarios' },
-  { href: '/reportes', icon: 'fa-file-alt', text: 'Ver Reportes' }
+  { href: '/agregar-parq', icon: 'fa-solid fa-car-alt', text: 'Agregar Parqueadero' },
+  { href: '/Admin', icon: 'fa-solid fa-car-alt', text: 'Mis parqueaderos' },
+  { href: '/Politicas', icon: 'fa-solid fa-shield-alt', text: 'Políticas' },
+  { href: '/Reservas', icon: 'fa-solid fa-calendar-check', text: 'Reservas' }
 ];
 ---
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sidebar</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <style>
-    .Sidebar {
-      background-color: #1c2222;
-      border-radius: 0.5rem 0.5rem 0 0;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-      padding: 1rem;
-      transition: transform 0.3s ease-in-out;
-      width: 100%; /* Cambiar a 100% en pantallas pequeñas */
-      max-width: 27rem; /* Ancho máximo del sidebar */
-      bottom: 130px; /* Ajusta la posición desde el borde inferior para que quede más arriba */
-      position: absolute;
-      left: 0; /* Alinea el sidebar a la izquierda */
-    }
+<aside class="Sidebar fixed bottom-8 left-8 z-50 flex flex-col bg-gray-800 rounded-lg shadow-lg transition-transform transform translate-y-0 p-4">
+  <div class="handle cursor-pointer text-white rounded-full absolute top-2 left-1/2 transform -translate-x-1/2 z-60">
+    <div class="w-10 h-1 bg-white"></div>
+  </div>
 
-    #sidebarContent {
-      width: 100%; /* Asegura que el contenido del sidebar tenga el mismo ancho */
-    }
-
-    .translate-y-full {
-      transform: translateY(100%);
-    }
-
-    .translate-y-0 {
-      transform: translateY(0);
-    }
-
-    .handle {
-      top: 1rem; /* Ajusta la posición de la rayita más cerca del borde superior del sidebar */
-      z-index: 60; /* Asegura que la rayita esté sobre el contenido del sidebar */
-      cursor: pointer;
-    }
-
-    /* Estilos para la barra de desplazamiento */
-    #sidebarContent::-webkit-scrollbar {
-      width: 8px; /* Ancho de la barra de desplazamiento */
-    }
-
-    #sidebarContent::-webkit-scrollbar-thumb {
-      background-color: rgba(255, 255, 255, 0.3); /* Color del "dedo" de la barra de desplazamiento */
-      border-radius: 10px; /* Bordes redondeados del "dedo" */
-    }
-
-    #sidebarContent::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.1); /* Color del fondo de la barra de desplazamiento */
-      border-radius: 10px; /* Bordes redondeados del track */
-    }
-
-    /* Media queries para pantallas pequeñas */
-    @media (max-width: 768px) {
-      .Sidebar {
-        width: 100%;
-        max-width: none; /* Quita el ancho máximo en pantallas pequeñas */
-      }
-
-      .handle {
-        display: block; /* Muestra la rayita en pantallas pequeñas */
-      }
-
-      /* Alinea el contenido al centro */
-      #sidebarContent {
-        width: 100%;
-      }
-    }
-
-    /* Media queries para pantallas medianas */
-    @media (min-width: 769px) and (max-width: 1024px) {
-      .Sidebar {
-        max-width: 20rem; /* Ajusta el ancho máximo para pantallas medianas */
-      }
-    }
-
-    /* Media queries para pantallas grandes */
-    @media (min-width: 1025px) {
-      .Sidebar {
-        left: 1rem; /* Ajusta la posición desde el borde izquierdo para pantallas grandes */
-        max-width: 25rem; /* Puedes ajustar el ancho máximo según sea necesario */
-      }
-    }
-  </style>
-</head>
-<body>
-  <aside class="Sidebar fixed bottom-8 left-4 z-50 flex flex-col bg-gray-800 rounded-t-lg shadow-lg transition-transform transform translate-y-full">
-    <!-- Rayita para desplegar el sidebar -->
-    <div class="handle cursor-pointer text-white rounded-full absolute top-2 left-1/2 transform -translate-x-1/2 z-60">
-      <div class="w-10 h-1 bg-white"></div>
+  <div id="sidebarContent" class="flex flex-col bg-gray-800 rounded-lg shadow-lg p-6 pt-5 relative overflow-y-auto max-h-[50vh] transition-transform transform translate-y-0">
+    <div class="flex items-center mb-4">
+      {auth && (
+        <button id="logoutButton" class="text-white hover:text-gray-300 transition-colors bg-gray-700 rounded-full p-2 mr-2" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      )}
+      <input type="text" id="searchInput" placeholder="Buscar" class="flex-grow px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      <button id="searchButton" class="ml-2 p-2 bg-blue-600 rounded-lg text-white hover:bg-blue-500">
+        <i class="fas fa-search"></i>
+      </button>
     </div>
     
-    <!-- Contenido del sidebar -->
-    <div id="sidebarContent" class="w-96 flex flex-col bg-gray-800 rounded-t-lg shadow-lg p-6 pt-16 relative overflow-y-auto max-h-[50vh]">
-      <!-- Campo de búsqueda -->
-      <div class="absolute top-4 left-1/2 transform -translate-x-1/2 w-full px-4">
-        <input type="text" placeholder="Buscar" class="w-full px-6 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    {!auth ? (
+      <div class="flex flex-row justify-center mb-4 space-x-4">
+        <a href="/registro" class="text-md text-white hover:text-gray-300 transition-colors bg-blue-500 px-6 py-2 rounded-lg">Registro</a>
+        <a href="/Login" class="text-md text-white hover:text-gray-300 transition-colors bg-green-500 px-6 py-2 rounded-lg">Inicio de Sesión</a>
       </div>
-      {!auth ? (
-      <!-- Botones de Registro e Inicio de Sesión -->
-      <div class="flex flex-row justify-center mt-1 mb-4 space-x-4 relative z-10">
-        <a href="/registro" class="text-md text-white hover:text-gray-300 transition-colors bg-blue-500 px-6 py-2 rounded-lg">
-          Registro
-        </a>
-        <a href="/login" class="text-md text-white hover:text-gray-300 transition-colors bg-green-500 px-6 py-2 rounded-lg">
-          Inicio de Sesión
-        </a>
-      </div>
-      ) : (
-      <!-- Botón de Salir -->
-      <button id="logoutButton" class="text-md text-white hover:text-gray-300 transition-colors bg-green-500 px-6 py-2 rounded-lg">
-        Salir
-      </button>
-      )}
-      
-      <!-- Enlaces -->
-      <nav class="flex flex-col items-start px-4 pt-12">
-        <ul class="space-y-4">
-          {isAdmin ? (
-            adminLinks.map(link => (
-              <li class="flex items-center">
-                <a href={link.href} class="flex items-center text-lg text-white hover:text-gray-300 transition-colors">
-                  <i class={`fas ${link.icon} mr-2`}></i>
-                  {link.text}
-                </a>
-              </li>
-            ))
-          ) : (
-            userLinks.map(link => (
-              <li class="flex items-center">
-                <a href={link.href} class="flex items-center text-lg text-white hover:text-gray-300 transition-colors">
-                  <i class={`fas ${link.icon} mr-2`}></i>
-                  {link.text}
-                </a>
-              </li>
-            ))
-          )}
-        </ul>
-      </nav>
-    </div>
-  </aside>
+    ) : null}
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const handle = document.querySelector('.handle');
-      const sidebar = document.querySelector('.Sidebar');
-      const logoutButton = document.getElementById('logoutButton');
+    <nav id="linkContainer" class="hidden flex-col items-start px-4 pt-4">
+      <ul class="space-y-4">
+        {(isAdmin ? adminLinks : userLinks).map(link => (
+          <li class="flex items-center">
+            <a href={link.href} class="flex items-center text-lg text-white hover:text-gray-300 transition-colors">
+              <i class={`fas ${link.icon} mr-2`}></i>
+              {link.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</aside>
 
-      if (handle && sidebar) {
-        handle.addEventListener('click', () => {
-          sidebar.classList.toggle('translate-y-full');
-          sidebar.classList.toggle('translate-y-0');
+<div id="map" class="w-full h-screen" data-markers={JSON.stringify(markers)}></div>
+
+<script type="text/javascript">
+  window.initMap = function() {
+    const mapElement = document.getElementById('map');
+    if (mapElement && window.google) {
+      const centroMapa = { lat: 6.2667791, lng: -75.750597 };
+      const map = new google.maps.Map(mapElement, {
+        zoom: 8,
+        center: centroMapa,
+      });
+
+      const geocoder = new google.maps.Geocoder();
+      const markers = JSON.parse(mapElement.getAttribute('data-markers') || '[]');
+
+      let currentInfoWindow = null;
+
+      markers.forEach(({ direccion, info, id }) => {
+        if (direccion) {
+          geocodeAddress(direccion, info, id);
+        }
+      });
+
+      function addMarker({ lat, lng, info, id }) {
+        const marker = new google.maps.Marker({
+          position: { lat, lng },
+          map,
+          title: info
+        });
+
+        const infoWindow = new google.maps.InfoWindow({
+          content: `
+            <div>
+              <p>${info}</p>
+              <button onclick="window.location.href='/Folleto?id=${id}'">Ver detalles</button>
+            </div>
+          `,
+        });
+        marker.addListener('click', () => {
+          if (currentInfoWindow) {
+            currentInfoWindow.close();
+          }
+          infoWindow.open(map, marker);
+          currentInfoWindow = infoWindow;
         });
       }
 
-      if (logoutButton) {
-        logoutButton.addEventListener('click', async (event) => {
-          event.preventDefault();
-          try {
-            const response = await fetch('http://localhost:2402/api/login/logout', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
+      function geocodeAddress(address, info, id) {
+        geocoder.geocode({ address }, (results, status) => {
+          if (status === 'OK' && results[0]) {
+            const location = results[0].geometry.location;
+            addMarker({
+              lat: location.lat(),
+              lng: location.lng(),
+              info: info || address,
+              id
             });
-
-            if (response.ok) {
-              window.location.href = '/login';
-            } else {
-              console.error('Error al cerrar sesión:', await response.json());
-              alert('No se pudo cerrar la sesión. Inténtalo de nuevo.');
-            }
-          } catch (error) {
-            console.error('Error al cerrar sesión:', error);
-            alert('Error inesperado. Inténtalo de nuevo.');
+          } else {
+            console.error(`Geocoding failed for address: ${address}, status: ${status}`);
           }
         });
       }
+
+      const searchAndZoom = (address) => {
+        geocoder.geocode({ address }, (results, status) => {
+          if (status === 'OK' && results[0]) {
+            const location = results[0].geometry.location;
+            map.setCenter(location);
+            map.setZoom(14);
+          } else {
+            console.error(`Geocoding failed for address: ${address}, status: ${status}`);
+          }
+        });
+      };
+
+      const input = document.getElementById('searchInput');
+      const autocomplete = new google.maps.places.Autocomplete(input);
+      autocomplete.setFields(['place_id', 'name']);
+
+      autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+        if (place.geometry) {
+          searchAndZoom(place.name);
+        }
+      });
+
+      document.getElementById('searchButton').addEventListener('click', () => {
+        const address = input.value;
+        if (address) {
+          searchAndZoom(address);
+        }
+      });
+    } else {
+      console.error('Google Maps API not loaded or map element not found.');
+    }
+  };
+
+  function logout() {
+  fetch('http://localhost:2402/api/login/logout', {
+    method: 'POST',
+    credentials: 'include' // Para enviar cookies junto con la solicitud
+  })
+  .then(response => {
+    if (response.ok) {
+      // Eliminar el token del localStorage
+      localStorage.removeItem('jwt_token');
+
+      // Redirigir a la página de inicio
+      window.location.href = '/';
+    } else {
+      console.error('Error al cerrar sesión');
+    }
+  })
+  .catch(error => console.error('Error en la solicitud:', error));
+}
+
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const handle = document.querySelector('.handle');
+    const sidebar = document.querySelector('.Sidebar');
+    const linkContainer = document.getElementById('linkContainer');
+
+    if (handle && sidebar) {
+      handle.addEventListener('click', () => {
+        sidebar.classList.toggle('translate-y-0');
+        linkContainer.classList.toggle('hidden');
+      });
+    }
+
+    loadMapScript().catch(error => {
+      console.error(error);
     });
-  </script>
-</body>
-</html>
+  });
+</script>
+
+<style>
+  .Sidebar {
+    background-color: #1c2222;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    padding: 1rem;
+    transition: transform 0.3s ease-in-out;
+    width: 100%;
+    max-width: 27rem;
+    bottom: 0;
+    position: fixed;
+    left: 0;
+    margin-left: 2rem;
+  }
+
+  #sidebarContent {
+    width: 100%;
+  }
+
+  .handle {
+    top: 1rem;
+    z-index: 60;
+    cursor: pointer;
+  }
+
+  #sidebarContent::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  #sidebarContent::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+  }
+
+  #sidebarContent::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+  }
+
+  #map {
+    height: 100vh;
+    width: 100%;
+  }
+
+  .Sidebar.hidden {
+    display: none;
+  }
+</style>
