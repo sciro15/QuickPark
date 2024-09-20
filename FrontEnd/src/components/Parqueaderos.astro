@@ -8,7 +8,7 @@ export interface Parqueadero {
     TarifaMensual?: number | null;
 }
 
-const { parqueaderos }: { parqueaderos: Parqueadero[] } = Astro.props;
+const { parqueaderos } = Astro.props;
 console.log("Datos de parqueaderos:", parqueaderos);
 ---
 
