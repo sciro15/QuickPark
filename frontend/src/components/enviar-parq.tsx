@@ -8,17 +8,15 @@ const AgregarTarifasServicios: React.FC = () => {
   const [Servicios, setServicios] = useState<string[]>([]);
   const [Caracteristicas, setCaracteristicas] = useState<string[]>([]);
   const [AdministradorID, setAdministradorID] = useState<string | null>(null);
+  const [ImagenPortada, setImagenPortada] = useState<File | null>(null);
 
-  // Servicios y características predefinidos
   const serviciosOpciones = ['Lavado de Autos', 'Vigilancia 24/7', 'Cargador Eléctrico', 'Valet Parking'];
   const caracteristicasOpciones = ['Techo Cubierto', 'Cámaras de Seguridad', 'Parqueo para Discapacitados', 'Espacios Amplios'];
 
   useEffect(() => {
-    // Obtener los datos del localStorage
     const storedData = localStorage.getItem('parqueaderoData');
     if (storedData) {
       const data = JSON.parse(storedData);
-      console.log('Datos almacenados en localStorage:', data);
       setTarifaHora(data.TarifaHora || "");
       setTarifaDia(data.TarifaDia || "");
       setTarifaMensual(data.TarifaMensual || "");
@@ -27,43 +25,37 @@ const AgregarTarifasServicios: React.FC = () => {
       setCaracteristicas(data.Caracteristicas || []);
     }
 
-    // Obtener el ID del administrador del localStorage
     const userData = localStorage.getItem('userData');
     if (userData) {
       try {
         const parsedUserData = JSON.parse(userData);
-        console.log('Datos del usuario desde localStorage:', parsedUserData);
         if (parsedUserData && parsedUserData.id) {
           setAdministradorID(parsedUserData.id);
-        } else {
-          console.warn('El objeto userData no contiene el campo id');
         }
       } catch (error) {
-        console.error('Error al parsear userData desde localStorage:', error);
+        console.error('Error al parsear userData:', error);
       }
-    } else {
-      console.warn('No se encontró userData en localStorage');
     }
   }, []);
 
   const handleServiciosChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setServicios(prev =>
-      prev.includes(value)
-        ? prev.filter(item => item !== value)
-        : [...prev, value]
+      prev.includes(value) ? prev.filter(item => item !== value) : [...prev, value]
     );
-    console.log('Servicios seleccionados:', Servicios);
   };
 
   const handleCaracteristicasChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setCaracteristicas(prev =>
-      prev.includes(value)
-        ? prev.filter(item => item !== value)
-        : [...prev, value]
+      prev.includes(value) ? prev.filter(item => item !== value) : [...prev, value]
     );
-    console.log('Características seleccionadas:', Caracteristicas);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setImagenPortada(e.target.files[0]);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -74,32 +66,31 @@ const AgregarTarifasServicios: React.FC = () => {
       TarifaDia,
       TarifaMensual,
       Descripcion,
-      Servicios,
-      Caracteristicas,
+      Servicios: JSON.stringify(Servicios),
+      Caracteristicas: JSON.stringify(Caracteristicas),
       AdministradorID,
     };
 
-    console.log('Datos del formulario antes de enviar:', parqueaderoData);
-
     const vistaAnteriorData = JSON.parse(localStorage.getItem('parqueaderoData') || '{}');
-    console.log('Datos de la vista anterior:', vistaAnteriorData);
-
     const combinedData = {
       ...vistaAnteriorData,
       ...parqueaderoData,
     };
 
-    console.log('Datos combinados antes de guardar en localStorage:', combinedData);
-
     localStorage.setItem('parqueaderoData', JSON.stringify(combinedData));
 
     try {
+      const formData = new FormData();
+      for (const key in combinedData) {
+        formData.append(key, combinedData[key]);
+      }
+      if (ImagenPortada) {
+        formData.append('ImagenPortada', ImagenPortada);
+      }
+
       const response = await fetch('http://localhost:2402/api/Parqueadero/parqueadero', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(combinedData),
+        body: formData,
       });
 
       if (!response.ok) {
@@ -109,29 +100,24 @@ const AgregarTarifasServicios: React.FC = () => {
       }
 
       const result = await response.json();
-      console.log('Resultado de la respuesta del servidor:', result);
       alert('Datos guardados correctamente en el servidor');
       
       localStorage.removeItem('parqueaderoData');
-
-      const id = result.id;
-      console.log('ID recibido del servidor:', id);
-      window.location.href = `/Folleto?id=${id}`;
+      window.location.href = '/agregar-parq';
     } catch (error) {
       console.error('Error en la solicitud:', error);
       alert('Error al guardar los datos en el servidor');
     }
   };
 
+  const handleVolver = () => {
+    window.location.href = '/agregar-parq';
+  };
+
   return (
     <div className="min-h-screen bg-cover bg-center flex justify-center items-center" style={{ backgroundImage: 'url("/images/fond.png")' }}>
       <div className="bg-gray-800 text-white bg-opacity-80 rounded-lg shadow-lg p-6 md:p-10 max-w-6xl w-full">
         <h2 className="text-3xl font-bold mb-6">Agregar Tarifas y Servicios</h2>
-        <div className="mb-8">
-          <p className="text-gray-300 mb-4">
-            Agrega las tarifas y servicios de tu parqueadero para que los usuarios puedan tener toda la información necesaria. Proporciona detalles sobre los costos por hora, día y mensualidad, además de los servicios y características que ofreces.
-          </p>
-        </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -146,7 +132,6 @@ const AgregarTarifasServicios: React.FC = () => {
                 className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none"
                 placeholder="Tarifa por Hora"
               />
-              <p>{TarifaHora && `Tarifa por Hora: ${TarifaHora}`}</p>
             </div>
             <div>
               <label className="block text-gray-300 mb-2">Tarifa por Día</label>
@@ -159,7 +144,6 @@ const AgregarTarifasServicios: React.FC = () => {
                 className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none"
                 placeholder="Tarifa por Día"
               />
-              <p>{TarifaDia && `Tarifa por Día: ${TarifaDia}`}</p>
             </div>
             <div>
               <label className="block text-gray-300 mb-2">Tarifa Mensual</label>
@@ -172,7 +156,6 @@ const AgregarTarifasServicios: React.FC = () => {
                 className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none"
                 placeholder="Tarifa Mensual"
               />
-              <p>{TarifaMensual && `Tarifa Mensual: ${TarifaMensual}`}</p>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -187,7 +170,16 @@ const AgregarTarifasServicios: React.FC = () => {
                 placeholder="Escribe una descripción de tu parqueadero"
                 rows={5}
               />
-              <p>{Descripcion && `Descripción: ${Descripcion}`}</p>
+            </div>
+            <div>
+              <label className="block text-gray-300 mb-2">Imagen de Portada</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none"
+              />
+              {ImagenPortada && <p className="mt-2 text-gray-300">Imagen seleccionada: {ImagenPortada.name}</p>}
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -209,7 +201,6 @@ const AgregarTarifasServicios: React.FC = () => {
                   </div>
                 ))}
               </div>
-              <p>{Servicios.length > 0 && `Servicios seleccionados: ${Servicios.join(", ")}`}</p>
             </div>
             <div>
               <label className="block text-gray-300 mb-2">Características</label>
@@ -229,10 +220,23 @@ const AgregarTarifasServicios: React.FC = () => {
                   </div>
                 ))}
               </div>
-              <p>{Caracteristicas.length > 0 && `Características seleccionadas: ${Caracteristicas.join(", ")}`}</p>
             </div>
           </div>
-          <button type="submit" className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded">Guardar</button>
+          <div className="flex justify-between">
+            <button
+              type="button"
+              onClick={handleVolver}
+              className="py-2 px-4 bg-gray-600 hover:bg-gray-700 text-white font-bold rounded flex items-center text-lg"
+            >
+              Volver
+            </button>
+            <button
+              type="submit"
+              className="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded flex items-center text-lg"
+            >
+              Guardar
+            </button>
+          </div>
         </form>
       </div>
     </div>

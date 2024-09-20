@@ -8,30 +8,38 @@ const Register = () => {
   const [Correo, setCorreo] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // Estado para mostrar/ocultar contraseña
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e : any) => {
     e.preventDefault();
 
+    // Validación string | null;e los campos
     if (!Usuario || !Contraseña || !Nombres || !Apellidos || !Correo) {
       setError("Por favor, completa todos los campos");
       return;
     }
 
+    const passwordPattern = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/; // Al menos 8 caracteres, una mayúscula, un número, sin caracteres especiales
+    if (!passwordPattern.test(Contraseña)) {
+      setError("La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.");
+      return;
+    }
+
     setLoading(true);
-    setError(""); // Limpiar error antes de la solicitud
+    setError("");
 
     try {
-      const response = await fetch("http://localhost:2402/api/personas/personas", {
+      const response = await fetch("http://localhost:2402/api/Administrador/Administrador", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "", // Añadir la clave API en el header
+          // "Authorization": "", // Añadir clave API si es necesario
         },
         body: JSON.stringify({ Nombres, Apellidos, Correo, Usuario, Contraseña }),
       });
 
       if (response.ok) {
-        window.location.replace("/Login"); // Redirigir al usuario después del Registro exitoso
+        window.location.replace("/Login");
       } else {
         const result = await response.json();
         setError(result.error || "Error de Registro");
@@ -46,35 +54,20 @@ const Register = () => {
 
   return (
     <div
-      className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed flex justify-center items-center"
+      className="min-h-screen flex justify-center items-center bg-cover"
       style={{ backgroundImage: 'url("/images/fond.png")' }}
     >
       <div className="bg-gray-800 text-white bg-opacity-80 rounded-lg shadow-lg p-6 md:p-8 max-w-lg w-full">
-        <div className="flex items-center mb-4">
-          <a href="/" className="text-white text-xl mr-3">
-            &larr; {/* Flecha de retroceso como entidad HTML */}
-          </a>
-          <div className="text-center flex-1">
-            <img
-              src="/images/Logo.png"
-              alt="Logo QuickPark"
-              className="mx-auto h-12 md:h-14"
-            />
-            <h2 className="text-lg md:text-xl font-bold mt-2">Registro</h2>
-          </div>
-        </div>
+        <h2 className="text-lg md:text-xl font-bold text-center mb-4">Registro</h2>
 
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label htmlFor="Nombres" className="block text-gray-300">
-              Nombres
-            </label>
+            <label htmlFor="Nombres" className="block text-gray-300">Nombres</label>
             <input
               type="text"
               id="Nombres"
-              name="Nombres"
               value={Nombres}
               onChange={(e) => setNombres(e.target.value)}
               className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
@@ -84,13 +77,10 @@ const Register = () => {
           </div>
 
           <div className="mb-3">
-            <label htmlFor="Apellidos" className="block text-gray-300">
-              Apellidos
-            </label>
+            <label htmlFor="Apellidos" className="block text-gray-300">Apellidos</label>
             <input
               type="text"
               id="Apellidos"
-              name="Apellidos"
               value={Apellidos}
               onChange={(e) => setApellidos(e.target.value)}
               className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
@@ -100,13 +90,10 @@ const Register = () => {
           </div>
 
           <div className="mb-3">
-            <label htmlFor="Correo" className="block text-gray-300">
-              Correo Electrónico
-            </label>
+            <label htmlFor="Correo" className="block text-gray-300">Correo Electrónico</label>
             <input
               type="email"
               id="Correo"
-              name="Correo"
               value={Correo}
               onChange={(e) => setCorreo(e.target.value)}
               className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
@@ -116,13 +103,10 @@ const Register = () => {
           </div>
 
           <div className="mb-3">
-            <label htmlFor="Usuario" className="block text-gray-300">
-              Usuario
-            </label>
+            <label htmlFor="Usuario" className="block text-gray-300">Usuario</label>
             <input
               type="text"
               id="Usuario"
-              name="Usuario"
               value={Usuario}
               onChange={(e) => setUsuario(e.target.value)}
               className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
@@ -131,20 +115,24 @@ const Register = () => {
             />
           </div>
 
-          <div className="mb-4">
-            <label htmlFor="Contraseña" className="block text-gray-300">
-              Contraseña
-            </label>
+          <div className="mb-4 relative">
+            <label htmlFor="Contraseña" className="block text-gray-300">Contraseña</label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               id="Contraseña"
-              name="Contraseña"
               value={Contraseña}
               onChange={(e) => setContraseña(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
+              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:border-blue-500 pr-10"
               placeholder="Contraseña"
               autoComplete="new-password"
             />
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-300"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <i className="fas fa-eye"></i> : <i className="fas fa-eye-slash"></i>}
+            </button>
           </div>
 
           <div className="mb-4 flex items-center">
@@ -168,9 +156,7 @@ const Register = () => {
 
           <p className="text-center text-gray-400 mt-4 text-sm md:text-base">
             ¿Ya tienes cuenta?{" "}
-            <a href="/Login" className="text-blue-500">
-              Inicia sesión
-            </a>
+            <a href="/Login" className="text-blue-500">Inicia sesión</a>
           </p>
         </form>
       </div>

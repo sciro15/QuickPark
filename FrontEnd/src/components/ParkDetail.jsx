@@ -5,18 +5,16 @@ const ParkDetail = () => {
   const [parkData, setParkData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Obtener el parámetro id de la URL
   const getIdFromUrl = () => {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
-    console.log('ID from URL:', id); // Verifica el id aquí
-  return id;
-    
+    console.log('ID from URL:', id);
+    return id;
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      const id = getIdFromUrl(); // Obtener id de la URL
+      const id = getIdFromUrl();
       if (!id) {
         console.error('No se encontró el parámetro id en la URL.');
         setLoading(false);
@@ -43,7 +41,6 @@ const ParkDetail = () => {
     return <p className="text-center p-4">Cargando datos...</p>;
   }
 
-  // Asegurar que Caracteristicas y Servicios sean arrays
   const caracteristicas = Array.isArray(parkData.Caracteristicas)
     ? parkData.Caracteristicas
     : typeof parkData.Caracteristicas === 'string'
@@ -59,10 +56,19 @@ const ParkDetail = () => {
   return (
     <div className="bg-gradient-to-r from-gray-100 to-green-100 min-h-screen flex flex-col items-center justify-center">
       <header className="w-full max-w-5xl flex flex-col md:flex-row justify-between p-4 bg-white shadow-md rounded-lg">
-        <div className="text-lg font-bold mb-2 md:mb-0"><a href="/">Regresar</a></div>
+        <div className="text-lg font-bold mb-2 md:mb-0">
+          <a href="/">Regresar</a>
+        </div>
         <nav className="space-x-4">
-          <a href="#" className="text-gray-700 hover:text-blue-500">NAVEGAR</a>
-          <a href="#" className="text-gray-700 hover:text-blue-500">CONTACTO</a>
+          <a 
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parkData.Direccion)}`} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-gray-700 hover:text-blue-500"
+          >
+            NAVEGAR
+          </a>
+          
         </nav>
       </header>
 
@@ -74,7 +80,7 @@ const ParkDetail = () => {
           </div>
           <div className="md:w-1/3 mb-6 md:mb-0">
             <img
-              src={parkData.ImagenPortada || '/default-image.jpg'}
+              src={`http://localhost:2402/uploads/${parkData.ImagenPortada}`}
               alt="Imagen del Parqueadero"
               className="w-full h-auto rounded-lg shadow-md"
             />

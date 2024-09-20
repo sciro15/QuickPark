@@ -63,6 +63,8 @@ console.log('Datos de parqueaderos recibidos:', parkings); // Imprime los datos 
 const markers = parkings.map((parking: any) => {
   return {
     direccion: parking.Direccion,
+    Nombre: parking.Nombre,
+    PrecioHora: parking.TarifaHora,
     info: `${parking.Nombre}: ${parking.Direccion}, Precio por hora: ${parking.TarifaHora}`, // Personaliza la información aquí
     id: parking.id // Incluye el ID en los datos del marcador
   };
@@ -81,7 +83,7 @@ console.log('ID del usuario desde localStorage:', userId); // Imprime el ID del 
   <main class="flex">
     <Sidebar isAdmin={isAdmin} auth={auth} markers={markers} id={userId} client:load/>
     <script
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCUh1x87CO7CnavPoYg8Onq0IEH1ck-3hM&libraries=places&callback=initMap"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCUh1x87CO7CnavPoYg8Onq0IEH1ck-3hM&libraries=places,marker&callback=initMap"
       defer
     ></script>
   </main>

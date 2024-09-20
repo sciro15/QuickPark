@@ -41,9 +41,9 @@ class AdministradorController {
 
     async actualizarAdministrador(req, res) {
         const { id } = req.params;
-        const { Nombres, Apellidos, Correo, Usuario, Contraseña } = req.body;
+        const { Nombres, Apellidos, Correo,  } = req.body;
         try {
-            const result = await this.AdministradorModel.updateAdministrador(id, Nombres, Apellidos, Correo, Usuario, Contraseña);
+            const result = await this.AdministradorModel.updateAdministrador(id, Nombres, Apellidos, Correo,);
             if (result.affectedRows === 0) {
                 return res.status(404).json({ error: 'Administrador no encontrado' });
             }
@@ -59,9 +59,11 @@ class AdministradorController {
             const result = await this.AdministradorModel.addAdministrador(Nombres, Apellidos, Correo, Usuario, Contraseña);
             res.status(201).json({ message: 'Administrador agregado correctamente', id: result.insertId });
         } catch (err) {
-            res.status(500).json({ error: 'Error al agregar Administrador' });
+            // Envía el mensaje de error específico del modelo al cliente
+            res.status(500).json({ error: err.message || 'Error al agregar Administrador' });
         }
     }
+    
 }
 
 export default AdministradorController;

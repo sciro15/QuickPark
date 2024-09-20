@@ -1,6 +1,27 @@
+import multer from 'multer';
+import path from 'path';
+
 class Parqueadero {
     constructor(database) {
         this.database = database;
+
+        // Configuración de multer
+        const storage = multer.diskStorage({
+            destination: (req, file, cb) => {
+                cb(null, 'uploads/'); // Carpeta donde se guardarán las imágenes
+            },
+            filename: (req, file, cb) => {
+                const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+                cb(null, uniqueSuffix + path.extname(file.originalname)); // Nombra el archivo de manera única
+            }
+        });
+
+        this.upload = multer({ storage });
+    }
+
+    // Middleware para subir imágenes
+    uploadMiddleware() {
+        return this.upload.single('ImagenPortada'); // Asegúrate de que este nombre coincida con el campo del formulario
     }
 
     // Obtener todos los parqueaderos
@@ -54,7 +75,7 @@ class Parqueadero {
         Descripcion,
         Servicios,
         Caracteristicas,
-        ImagenPortada = null // Valor predeterminado si no se pasa
+        ImagenPortada // Aquí es donde recibimos el nombre del archivo
     ) {
         const query = `
             INSERT INTO Parqueadero 
@@ -62,7 +83,6 @@ class Parqueadero {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
-        // Asegúrate de que todos los valores no sean undefined, reemplazando undefined por null
         const values = [
             Nombre || null,
             Direccion || null,
@@ -75,14 +95,14 @@ class Parqueadero {
             TarifaDia || null,
             TarifaMensual || null,
             Descripcion || null,
-            Servicios ? JSON.stringify(Servicios) : null,  // JSON string of services
-            Caracteristicas ? JSON.stringify(Caracteristicas) : null, // JSON string of characteristics
-            ImagenPortada || null // ImagenPortada se permite null si es opcional
+            Servicios ? JSON.stringify(Servicios) : null,
+            Caracteristicas ? JSON.stringify(Caracteristicas) : null,
+            ImagenPortada || null
         ];
 
         try {
-            const [result] = await this.database.execute(query, values); // Asegúrate de que this.database se está utilizando correctamente
-            return result;  // Aquí debería tener `insertId`
+            const [result] = await this.database.execute(query, values);
+            return result; // Aquí debería tener `insertId`
         } catch (error) {
             console.error("Error al agregar parqueadero:", error);
             throw error;
@@ -105,14 +125,14 @@ class Parqueadero {
         Descripcion,
         Servicios,
         Caracteristicas,
-        ImagenPortada
+        ImagenPortada // Aquí también lo recibimos
     ) {
         let query = `
             UPDATE Parqueadero
             SET Nombre = ?, Direccion = ?, Telefono = ?, Correo = ?, lat = ?, lng = ?, TarifaHora = ?, TarifaDia = ?, TarifaMensual = ?, Descripcion = ?, Servicios = ?, Caracteristicas = ?, ImagenPortada = ?
             WHERE id = ?
         `;
-    
+
         const values = [
             Nombre,
             Direccion,
@@ -126,10 +146,10 @@ class Parqueadero {
             Descripcion,
             Servicios ? JSON.stringify(Servicios) : null,
             Caracteristicas ? JSON.stringify(Caracteristicas) : null,
-            ImagenPortada,
+            ImagenPortada || null,
             id
         ];
-    
+
         // Si AdministradorID está definido, lo incluimos en la consulta
         if (AdministradorID !== undefined) {
             query = `
@@ -139,7 +159,7 @@ class Parqueadero {
             `;
             values.splice(6, 0, AdministradorID); // Insertar AdministradorID en la posición correcta
         }
-    
+
         try {
             const [result] = await this.database.query(query, values);
             return result;
@@ -148,7 +168,6 @@ class Parqueadero {
             throw error;
         }
     }
-    
 
     // Obtener parqueaderos por administrador
     async getParqueaderosByAdministrador(id) {

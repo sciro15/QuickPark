@@ -13,6 +13,7 @@ interface Parqueadero {
   TarifaHora?: number | null;
   TarifaDia?: number | null;
   TarifaMensual?: number | null;
+  ImagenPortada?: string | null;
 }
 
 const AdminParqueaderos: React.FC = () => {
@@ -60,11 +61,10 @@ const AdminParqueaderos: React.FC = () => {
   }, [id]);
 
   const handleDetailsClick = (parqueadero: Parqueadero) => {
-    console.log('Detalles', parqueadero);
+    window.location.href = `/Folleto?id=${parqueadero.id}`;
   };
 
   const handleEditClick = (parqueadero: Parqueadero) => {
-    // Redirigir a la página de actualización pasando el ID del parqueadero
     window.location.href = `/ActualizarParqueaderoPage?id=${parqueadero.id}`;
   };
 
@@ -103,40 +103,59 @@ const AdminParqueaderos: React.FC = () => {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <div className="w-full bg-gray-100 p-6 rounded-lg shadow-lg">
-      <a href="/" className="text-black text-2xl mr-4">
-        &larr; {/* Flecha de retroceso como entidad HTML */}
-      </a>
-      <ToastContainer />
-      <h1 className="text-2xl font-bold mb-4">Parqueaderos del Administrador</h1>
-      <div className="space-y-6">
+    <div className="w-full bg-white p-6 rounded-lg shadow-md">
+      <div className="flex items-center mb-4">
+        <a href="/" className="text-gray-600 hover:text-blue-600 text-lg flex items-center mr-4">
+          <i className="fas fa-arrow-left mr-2"></i> Volver
+        </a>
+        <h1 className="text-4xl font-bold text-gray-800 flex-1 text-center mb-4">Parqueaderos Registrados</h1>
+      </div>
+      <div className="flex flex-col space-y-6 w-full max-w-4xl">
         {parqueaderos.length > 0 ? (
           parqueaderos.map(parking => (
-            <div key={parking.id} className="flex flex-col md:flex-row items-start bg-white rounded-lg shadow-md p-4 space-y-4 md:space-y-0 md:space-x-4 border-b pb-4">
-              {parking.img ? (
-                <img src={parking.img} alt={parking.Nombre || "Imagen de parqueadero"} className="w-24 h-24 md:w-32 md:h-32 rounded-lg object-cover" />
-              ) : (
-                <div className="w-24 h-24 md:w-32 md:h-32 rounded-lg bg-gray-200 flex items-center justify-center">
-                  <span>Cargando imagen...</span>
+            <div key={parking.id} className="bg-white rounded-lg shadow-md p-4 flex flex-row space-x-6">
+              {/* Contenedor de imagen e información */}
+              <div className="w-3/4 flex-grow flex flex-col bg-gray-100 p-4 rounded-lg">
+                <div className="flex flex-row">
+                  <div className="w-1/4">
+                    {parking.ImagenPortada ? (
+                      <img
+                      src={`http://localhost:2402/uploads/${parking.ImagenPortada}`} 
+                        className="w-full h-32 rounded-lg object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-32 rounded-lg bg-gray-200 flex items-center justify-center">
+                        <span>Cargando imagen...</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="w-3/4 pl-4">
+                    <h2 className="text-xl font-semibold">{parking.Nombre || "Nombre no disponible"}</h2>
+                    <p><strong>Dirección:</strong> {parking.Direccion || "Dirección no disponible"}</p>
+                    <p><strong>Tarifa por hora:</strong> {parking.TarifaHora ? `$${parking.TarifaHora}` : "Tarifa no disponible"}</p>
+                    <p><strong>Tarifa por día:</strong> {parking.TarifaDia ? `$${parking.TarifaDia}` : "Tarifa no disponible"}</p>
+                    <p><strong>Tarifa mensual:</strong> {parking.TarifaMensual ? `$${parking.TarifaMensual}` : "Tarifa no disponible"}</p>
+                  </div>
                 </div>
-              )}
-              <div className="flex-grow">
-                <h2 className="text-xl font-semibold">{parking.Nombre || "Nombre no disponible"}</h2>
-                <p><strong>Dirección:</strong> {parking.Direccion || "Dirección no disponible"}</p>
-                <p><strong>Tarifa por hora:</strong> {parking.TarifaHora ? `$${parking.TarifaHora}` : "Tarifa no disponible"}</p>
-                <p><strong>Tarifa por día:</strong> {parking.TarifaDia ? `$${parking.TarifaDia}` : "Tarifa no disponible"}</p>
-                <p><strong>Tarifa mensual:</strong> {parking.TarifaMensual ? `$${parking.TarifaMensual}` : "Tarifa no disponible"}</p>
               </div>
-              <div className="flex flex-col mt-4 space-y-2">
-                <div className="flex space-x-2 mt-4">
-                  <button onClick={() => handleDetailsClick(parking)} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
-                    <FontAwesomeIcon icon={faEye} className="mr-2" /> Detalles
-                  </button>
-                  <button onClick={() => handleEditClick(parking)} className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition">
-                    <FontAwesomeIcon icon={faEdit} className="mr-2" /> Editar
-                  </button>
-                </div>
-                <button onClick={() => handleDeleteClick(parking)} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition mt-2">
+              {/* Contenedor de los botones */}
+              <div className="w-1/4 bg-white flex flex-col justify-center space-y-2 p-4 rounded-lg shadow-md">
+                <button
+                  onClick={() => handleDetailsClick(parking)}
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+                >
+                  <FontAwesomeIcon icon={faEye} className="mr-2" /> Detalles
+                </button>
+                <button
+                  onClick={() => handleEditClick(parking)}
+                  className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
+                >
+                  <FontAwesomeIcon icon={faEdit} className="mr-2" /> Editar
+                </button>
+                <button
+                  onClick={() => handleDeleteClick(parking)}
+                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+                >
                   <FontAwesomeIcon icon={faTrash} className="mr-2" /> Eliminar
                 </button>
               </div>

@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft, faCheck } from '@fortawesome/free-solid-svg-icons';
 
 const AgregarParqueadero: React.FC = () => {
   const [Nombre, setNombre] = useState('');
@@ -10,7 +12,7 @@ const AgregarParqueadero: React.FC = () => {
   const [Ciudad, setCiudad] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
- 
+
   const direccionInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,7 +28,6 @@ const AgregarParqueadero: React.FC = () => {
 
     try {
       localStorage.setItem('parqueaderoData', JSON.stringify({ Nombre, Direccion, Telefono, Correo, lat, lng, Ciudad }));
-
       window.location.href = '/enviar-parq'; 
     } catch (error) {
       console.error('Error en el Registro:', error);
@@ -141,7 +142,7 @@ const AgregarParqueadero: React.FC = () => {
                 <input
                   type="text"
                   id="Direccion"
-                  ref={direccionInputRef} 
+                  ref={direccionInputRef}
                   className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none"
                   placeholder="Dirección"
                 />
@@ -201,13 +202,24 @@ const AgregarParqueadero: React.FC = () => {
                 Aceptar términos y condiciones
               </label>
             </div>
+            <div className="flex justify-between">
             <button
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded"
-              disabled={loading}
-            >
-              {loading ? 'Registrando...' : 'Registrar Parqueadero'}
-            </button>
+                onClick={() => window.location.href = '/'}
+                className="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded flex items-center"
+              >
+                <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
+                Volver
+              </button>
+              <button
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded flex items-center"
+                disabled={loading}
+              >
+                <FontAwesomeIcon icon={faCheck} className="mr-2" />
+                {loading ? 'Registrando...' : 'Registrar Parqueadero'}
+              </button>
+              
+            </div>
           </form>
         </div>
         {/* Sección derecha con el mapa */}

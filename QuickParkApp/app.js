@@ -5,13 +5,19 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import router from './routes/app.js';
 import session from 'express-session';
-
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Servir archivos estáticos desde la carpeta 'uploads'
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(cors({
   origin: 'http://localhost:4321', // Cambia esto por el origen de tu frontend
   credentials: true, // Permite el uso de cookies y otros encabezados de credenciales
