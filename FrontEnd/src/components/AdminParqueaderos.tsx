@@ -64,7 +64,8 @@ const AdminParqueaderos: React.FC = () => {
   };
 
   const handleEditClick = (parqueadero: Parqueadero) => {
-    console.log('Editar', parqueadero);
+    // Redirigir a la página de actualización pasando el ID del parqueadero
+    window.location.href = `/ActualizarParqueaderoPage?id=${parqueadero.id}`;
   };
 
   const handleDeleteClick = async (parqueadero: Parqueadero) => {
@@ -103,9 +104,9 @@ const AdminParqueaderos: React.FC = () => {
 
   return (
     <div className="w-full bg-gray-100 p-6 rounded-lg shadow-lg">
-        <a href="/" className="text-black text-2xl mr-4">
-            &larr; {/* Flecha de retroceso como entidad HTML */}
-        </a>
+      <a href="/" className="text-black text-2xl mr-4">
+        &larr; {/* Flecha de retroceso como entidad HTML */}
+      </a>
       <ToastContainer />
       <h1 className="text-2xl font-bold mb-4">Parqueaderos del Administrador</h1>
       <div className="space-y-6">

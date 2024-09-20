@@ -107,12 +107,12 @@ class Parqueadero {
         Caracteristicas,
         ImagenPortada
     ) {
-        const query = `
+        let query = `
             UPDATE Parqueadero
-            SET Nombre = ?, Direccion = ?, Telefono = ?, Correo = ?, lat = ?, lng = ?, AdministradorID = ?, TarifaHora = ?, TarifaDia = ?, TarifaMensual = ?, Descripcion = ?, Servicios = ?, Caracteristicas = ?, ImagenPortada = ?
+            SET Nombre = ?, Direccion = ?, Telefono = ?, Correo = ?, lat = ?, lng = ?, TarifaHora = ?, TarifaDia = ?, TarifaMensual = ?, Descripcion = ?, Servicios = ?, Caracteristicas = ?, ImagenPortada = ?
             WHERE id = ?
         `;
-
+    
         const values = [
             Nombre,
             Direccion,
@@ -120,7 +120,6 @@ class Parqueadero {
             Correo,
             lat,
             lng,
-            AdministradorID,
             TarifaHora,
             TarifaDia,
             TarifaMensual,
@@ -130,7 +129,17 @@ class Parqueadero {
             ImagenPortada,
             id
         ];
-
+    
+        // Si AdministradorID está definido, lo incluimos en la consulta
+        if (AdministradorID !== undefined) {
+            query = `
+                UPDATE Parqueadero
+                SET Nombre = ?, Direccion = ?, Telefono = ?, Correo = ?, lat = ?, lng = ?, AdministradorID = ?, TarifaHora = ?, TarifaDia = ?, TarifaMensual = ?, Descripcion = ?, Servicios = ?, Caracteristicas = ?, ImagenPortada = ?
+                WHERE id = ?
+            `;
+            values.splice(6, 0, AdministradorID); // Insertar AdministradorID en la posición correcta
+        }
+    
         try {
             const [result] = await this.database.query(query, values);
             return result;
@@ -139,6 +148,7 @@ class Parqueadero {
             throw error;
         }
     }
+    
 
     // Obtener parqueaderos por administrador
     async getParqueaderosByAdministrador(id) {
